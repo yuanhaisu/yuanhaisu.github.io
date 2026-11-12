@@ -1,7 +1,7 @@
 ---
 platform: 微信公众号
 status: draft
-canonical: https://yuanhaisu.com/posts/one-person-delivery-experiment-01-multi-agent-saas
+canonical: https://yuanhaisu.github.io/posts/one-person-delivery-experiment-01-multi-agent-saas
 publish_after: 博客上线后 1 周内
 ---
 
@@ -75,13 +75,13 @@ AI 明显加速的是第三块；第一、二、四块反而更需要人。这�
 
 完整版（含架构图、流水线图和多租户隔离图）在个人博客，点击「阅读原文」查看：
 
-https://yuanhaisu.com/posts/one-person-delivery-experiment-01-multi-agent-saas
+https://yuanhaisu.github.io/posts/one-person-delivery-experiment-01-multi-agent-saas
 
 ---
 
 发布备注（不进入正文）：
 
 - 公众号正文不能放可点击外链；把上面的博客 URL 填到「阅读原文」。
-- 发布前确认 `https://yuanhaisu.com` 已上线；若域名未上线，先用 `*.pages.dev` 预览链接，但正式发布时换成 canonical。
+- 发布前确认 `https://yuanhaisu.github.io` 已上线；若尚未部署，先不要发布，避免读者打开死链。
 - 配图建议用 `/images/multi-agent-pipeline.svg` 与 `/images/nurture-planet-architecture.svg` 导出为 PNG/WebP，按公众号移动端宽度裁切。
 - 不出现客户名称、幼儿园名称、儿童信息、手机号、内部域名、密钥。

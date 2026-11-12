@@ -39,9 +39,13 @@ export async function validateLlms(rootDir, posts) {
     assert(text.includes(post.title), `llms.txt 缺少文章标题：${post.title}`)
   }
 
-  const indexedPosts = [
-    ...text.matchAll(/https:\/\/yuanhaisu\.com\/posts\/[^\s)（]+/g),
-  ].map((match) => match[0])
+  const postUrlPattern = new RegExp(
+    `${SITE_ORIGIN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/posts/[^\\s)（]+`,
+    'g',
+  )
+  const indexedPosts = [...text.matchAll(postUrlPattern)].map(
+    (match) => match[0],
+  )
   assert(
     indexedPosts.length === posts.length,
     `llms.txt 文章索引数应为 ${posts.length}，实际 ${indexedPosts.length}`,

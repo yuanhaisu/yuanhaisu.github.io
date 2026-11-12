@@ -1,9 +1,9 @@
 # 一人交付笔记 — 实施总案（GitHub 优先版）
 
-> 域名：`yuanhaisu.com`　站名：`一人交付笔记`　作者：`袁海粟（Yuan Haisu / yuanhaisu）`
+> 域名：`yuanhaisu.com`（保留，未来可接回）　v1 站点：`https://yuanhaisu.github.io`　站名：`一人交付笔记`　作者：`袁海粟（Yuan Haisu / yuanhaisu）`
 > 定位：一人公司的 AI 交付实验　核心读者：独立开发者 / 一人公司
 > 成功标准：GEO 四场景（实体认知、内容引用、机器可读、信任传递）
-> v1 策略：GitHub 内容源 → Cloudflare Pages → `yuanhaisu.com`；中文 canonical；国外优先、英文 v1.1；国内靠知乎/公众号分发
+> v1 策略：GitHub 内容源 → GitHub Actions → GitHub Pages → `https://yuanhaisu.github.io`；中文 canonical；国外优先、英文 v1.1；国内靠知乎/公众号分发
 
 ---
 
@@ -14,16 +14,17 @@
 | ADR-0001 | 定位与成功标准 | 有效 |
 | ADR-0002 | 阿里云 + ICP 托管 | **v1 由 ADR-0007 取代**；保留为未来国内镜像选项 |
 | ADR-0003 | 身份、定位与转化 | 有效（2026-11-04 修订） |
-| ADR-0004 | 技术栈、内容管理与部署 | 有效（部署改为 Cloudflare Pages） |
+| ADR-0004 | 技术栈、内容管理与部署 | 有效（部署部分由 ADR-0008 取代） |
 | ADR-0005 | v1 范围与服务 | **v1 由 ADR-0007 取代**；保留原始决策供追溯 |
 | ADR-0006 | GEO 与授权 | 有效（2026-11-04 修订） |
-| ADR-0007 | GitHub 优先与分发策略 | 有效，v1 的总纲 |
+| ADR-0007 | GitHub 优先与分发策略 | 有效（托管与规范 URL 由 ADR-0008 取代） |
+| ADR-0008 | GitHub Pages 作为 v1 托管 | 有效，当前部署依据 |
 
 **核心事实**
 
 - GitHub 账号 `github.com/yuanhaisu` 为本人所有，但无 Profile README、0 followers，内容以旧 fork 为主。
 - `kindergarten` 公开仓库配置审计：env / ini / mcp 配置中未发现真实密钥，未做全仓库秘密扫描；`parent/.env.development` 含非占位 URL，`.mcp.json` 暴露本地路径，仓库无 README/LICENSE、99MB、含内部文档。
-- GitHub Pages 国内直连不稳定；Cloudflare Pages 更稳且支持自定义 HTTP 头。
+- GitHub Pages 国内直连不稳定；v1 仍选择 GitHub Pages 以降低上线门槛，国内触达靠知乎/公众号分发。
 - 域名指向境外托管无需 ICP；未来国内镜像需独立域名 + ICP。
 
 ---
@@ -31,30 +32,30 @@
 ## 2. 目标架构
 
 ```text
-┌────────────────────┐      push       ┌──────────────────────────┐
-│ GitHub 公开仓库      │ ──────────────▶ │ Cloudflare Pages 构建     │
-│ yuanhaisu/blog      │                 │ Nuxt 4 + Content 3        │
-│ Markdown + Git      │                 │ nuxt generate             │
-└────────────────────┘                 └────────────┬─────────────┘
-                                                   │
-                                                   ▼
-                                    ┌──────────────────────────┐
-                                    │ yuanhaisu.com（静态）      │
-                                    │ Cloudflare CDN + DNS      │
-                                    └───────┬─────────┬────────┘
-                                            │         │
-                      ┌─────────────────────┘         └─────────────────────┐
-                      ▼                                                     ▼
-          ┌──────────────────────┐                              ┌──────────────────────┐
-          │ Giscus（评论）        │                              │ Pagefind（站内搜索）   │
-          │ GitHub Discussions   │                              │ 构建期索引             │
-          └──────────────────────┘                              └──────────────────────┘
-                      │
-                      ▼
-          ┌──────────────────────┐        ┌──────────────────────┐
-          │ Cloudflare Web       │        │ 百度统计              │
-          │ Analytics            │        │ 国内流量细节           │
-          └──────────────────────┘        └──────────────────────┘
+┌──────────────────────────┐      push       ┌──────────────────────────┐
+│ GitHub 公开仓库            │ ──────────────▶ │ GitHub Actions 构建        │
+│ yuanhaisu.github.io       │                 │ Nuxt 4 + Content 3        │
+│ Markdown + Git            │                 │ nuxt generate             │
+└──────────────────────────┘                 └────────────┬─────────────┘
+                                                          │
+                                                          ▼
+                                           ┌──────────────────────────┐
+                                           │ yuanhaisu.github.io      │
+                                           │ GitHub Pages（静态）       │
+                                           └───────┬─────────┬────────┘
+                                                   │         │
+                     ┌─────────────────────────────┘         └─────────────────────┐
+                     ▼                                                             ▼
+         ┌──────────────────────┐                              ┌──────────────────────┐
+         │ Giscus（评论）        │                              │ Pagefind（站内搜索）   │
+         │ GitHub Discussions   │                              │ 构建期索引             │
+         └──────────────────────┘                              └──────────────────────┘
+                     │
+                     ▼
+         ┌──────────────────────┐        ┌──────────────────────┐
+         │ Cloudflare Web       │        │ 百度统计              │
+         │ Analytics            │        │ 国内流量细节           │
+         └──────────────────────┘        └──────────────────────┘
 
 分发：
   博客（中文 canonical）──▶ 知乎（全文/改编）
@@ -62,25 +63,25 @@
   GitHub Profile README ──▶ 博客 / 知乎 / 公众号
 
 未来（v2，可选）：
-  国内镜像 yuanhaisu.cn ── 阿里云 + ICP ── canonical 指向 yuanhaisu.com
+  自定义域 yuanhaisu.com / 国内镜像 ── 切换 NUXT_PUBLIC_SITE_ORIGIN ── canonical 统一迁移
 ```
 
 ### 2.1 组件清单
 
 | 层 | 选型 | 说明 |
 | --- | --- | --- |
-| 内容源 | GitHub `yuanhaisu/blog`（public） | Markdown + Git；草稿放私有仓库 |
+| 内容源 | GitHub `yuanhaisu/yuanhaisu.github.io`（public） | Markdown + Git；草稿放私有仓库或忽略目录 |
 | 框架 | Nuxt 4.6.x + Nuxt Content 3.16.x | Nuxt 3 已 EOL；Content v3 使用 `content.config.ts` + `queryCollection()` |
 | 构建 | `nuxt generate` | 纯静态 HTML；正文不依赖 JS |
-| 托管/CDN | Cloudflare Pages + Cloudflare DNS | 从 GitHub 构建；`_headers` 配置 CSP/HSTS |
-| 规范 URL | `https://yuanhaisu.com` | apex canonical；`www` 301 |
-| 评论 | Giscus | GitHub Discussions；国内读者引导到知乎/公众号 |
+| 托管/CDN | GitHub Pages（GitHub Actions） | 推送 `main` 自动构建发布；不支持自定义响应头 |
+| 规范 URL | `https://yuanhaisu.github.io` | 可用 `NUXT_PUBLIC_SITE_ORIGIN` 切换到 `yuanhaisu.com` |
+| 评论 | Giscus | GitHub Discussions，Announcements 分类；国内读者引导到知乎/公众号 |
 | 统计 | Cloudflare Web Analytics + 百度统计 | 全球基线 + 国内细节 |
-| 搜索 | Pagefind 1.5+ | 支持中文查询分词；上线前实测，备选 FlexSearch |
+| 搜索 | Pagefind 1.6+ | 支持中文查询分词 |
 | Newsletter | 微信公众号 | 中文；英文 Buttondown 放 v1.1 |
-| 域名邮箱 | 阿里云企业邮箱免费版 | `hi@yuanhaisu.com`；DNS 在 Cloudflare，添加 MX/SPF/DKIM |
+| 域名邮箱 | 阿里云企业邮箱免费版 | `hi@yuanhaisu.com`，**待开通**；当前无 MX，公开联系优先 GitHub |
 | 分发 | 知乎 + 微信公众号 | 每月 1 篇旗舰；小红书/抖音 v2 |
-| 未来镜像 | `yuanhaisu.cn` + 阿里云 + ICP | v2 再决策，canonical 指向 `yuanhaisu.com` |
+| 未来托管 | `yuanhaisu.com` + Cloudflare Pages（归档） | 需要时切回，canonical 由 `NUXT_PUBLIC_SITE_ORIGIN` 统一切换 |
 
 ### 2.2 URL 结构
 
@@ -101,7 +102,7 @@
 
 约定：
 
-- `https://yuanhaisu.com` 为规范 URL；`www` 301。
+- `https://yuanhaisu.github.io` 为当前规范 URL；未来接回 `yuanhaisu.com` 时统一切换。
 - slug 发布后不改；必须改时保留 301。
 - 每篇文章输出 `datePublished`、`dateModified`、`inLanguage: zh-CN`；英文版 `inLanguage: en`。
 - 每篇页脚展示 CC BY 4.0 与原文链接。
@@ -134,7 +135,7 @@ export default defineContentConfig({
 })
 ```
 
-发布流程：新建 `.md` → 本地预览 → commit → push → Cloudflare Pages 构建 → 部署。无后台、无数据库写入。
+发布流程：新建 `.md` → 本地预览 → commit → push → GitHub Actions 构建 → GitHub Pages 发布。无后台、无数据库写入。
 
 ---
 
@@ -143,7 +144,7 @@ export default defineContentConfig({
 | 项目 | 估算 | 备注 |
 | --- | --- | --- |
 | 域名摊销 | 5–10 元/月 | `.com` 年费约 60–120 元；保留现有注册商，改 DNS 到 Cloudflare |
-| Cloudflare Pages | 0 元 | 静态站点免费层；500 builds/月、带宽与请求免费 |
+| GitHub Pages | 0 元 | 公开仓库静态站点免费；GitHub Actions 免费额度足够 |
 | GitHub | 0 元 | 公开仓库免费 |
 | 阿里云企业邮箱 | 0 元 | 免费版；需实名与 7 天内配置 MX/SPF |
 | 百度统计 | 0 元 | 免费 |
@@ -151,7 +152,7 @@ export default defineContentConfig({
 | Buttondown（v1.1） | 0–10 元/月 | 英文邮件；免费层足够早期 |
 | **合计** | **约 5–20 元/月** | 远低于 100–200 元预算 |
 
-若未来流量增大，可考虑 Cloudflare Pages Pro（约 20 美元/月）或国内镜像；v1 不需要。
+若未来流量增大或需要自定义安全头，可考虑 Cloudflare Pages（已归档）或国内镜像；v1 不需要。
 
 ---
 
@@ -163,7 +164,7 @@ export default defineContentConfig({
 
 - GitHub Profile 整理：新建 `yuanhaisu/yuanhaisu` README（中英双语）、归档旧 fork、pin 6 个仓库。
 - `kindergarten` 处理：保持私有；新建 `nurture-planet-case-study` 公开案例仓库。
-- Cloudflare 账号、Pages 项目、DNS 迁移。
+- GitHub 仓库 Settings → Pages：Source 设为 GitHub Actions。
 - 阿里云企业邮箱免费版，配置 MX/SPF/DKIM。
 - 知乎、微信公众号账号注册与资料统一。
 - 百度统计、Cloudflare Web Analytics、Giscus 配置准备。
@@ -178,7 +179,7 @@ export default defineContentConfig({
 - 页面：首页、文章列表、文章详情、About、专题页、404。
 - Markdown 渲染：代码高亮、目录、图片优化、上一篇/下一篇、阅读时长。
 - 深色模式、响应式、中文字体子集化。
-- Cloudflare Pages 预览部署。
+- GitHub Pages 发布工作流。
 
 **产物**：可浏览的完整站点骨架 + 设计规范 + 预览 URL。
 
@@ -189,7 +190,7 @@ export default defineContentConfig({
 - Pagefind 搜索接入，用真实中文文章测试分词；不合格换 FlexSearch。
 - Giscus 评论接入（次要入口）。
 - Cloudflare Web Analytics + 百度统计接入。
-- Cloudflare `_headers`：CSP、HSTS、缓存策略。
+- `cloudflare/_headers`（归档）：CSP、HSTS、缓存策略，当前不部署。
 
 **产物**：GEO 检查清单全绿；`curl` 可读到完整正文；搜索/评论/统计可用。
 
@@ -205,7 +206,7 @@ export default defineContentConfig({
 
 - 性能预算：国内 LCP < 2.5s、CLS < 0.1；移动端可用。
 - 可访问性：键盘导航、对比度、alt 文本。
-- DNS 切换、HTTPS、`www` 301、sitemap 提交。
+- GitHub Pages 发布、HTTPS、canonical 复验、sitemap 提交。
 - 百度站长、必应 Webmaster、Google Search Console。
 - 监控 48h；记录 GEO 基线。
 
@@ -281,12 +282,12 @@ export default defineContentConfig({
 
 ### 7.1 技术
 
-- JSON-LD：`Person`（`@id: https://yuanhaisu.com/#person`）、`WebSite`、`BlogPosting`、`BreadcrumbList`。
+- JSON-LD：`Person`（`@id: https://yuanhaisu.github.io/#person`）、`WebSite`、`BlogPosting`、`BreadcrumbList`。
 - `Person.sameAs`：GitHub、知乎、微信公众号、RSS。
 - `sitemap.xml`、`feed.xml`、`robots.txt`、`llms.txt`。
 - canonical、OpenGraph、Twitter Card、语义化 HTML。
 - 禁用 JavaScript 后正文完整可读。
-- Cloudflare `_headers`：CSP、HSTS、缓存策略。
+- `cloudflare/_headers`（归档）：CSP、HSTS、缓存策略，当前不部署。
 
 ### 7.2 内容与实体
 
@@ -314,7 +315,7 @@ export default defineContentConfig({
 ### 8.1 合规
 
 - v1 托管在境外，不需要 ICP / 公安备案。
-- 未来国内镜像：独立域名 `yuanhaisu.cn` + 独立 ICP；canonical 指向 `yuanhaisu.com`。
+- 未来国内镜像：独立域名 `yuanhaisu.cn` + 独立 ICP；canonical 指向当前规范 URL。
 - 知乎/公众号内容遵守平台规则；不写敏感话题，不发客户/儿童信息。
 - Giscus 评论在 GitHub 上；国内读者引导到知乎/公众号。
 - 百度统计与 Newsletter 需在隐私页说明数据范围。
@@ -324,7 +325,7 @@ export default defineContentConfig({
 
 | 风险 | 影响 | 缓解 |
 | --- | --- | --- |
-| Cloudflare 国内访问波动 | 国内读者体验不稳 | 国内触达靠知乎/公众号；v2 可选国内镜像 |
+| GitHub Pages 国内访问波动 | 国内读者体验不稳 | 国内触达靠知乎/公众号；v2 可选国内镜像 |
 | 英文翻译拖延 | 国外 GEO 无法启动 | 上线后 3 个月硬 gate；每月检查 |
 | 写作断更 | GEO 无燃料 | 每月 1 篇旗舰；先列提纲再写 |
 | GitHub Profile 整理耗时 | 推迟建站 | 限时 2 周；先做 README + 归档 |
@@ -342,9 +343,9 @@ export default defineContentConfig({
 - [ ] 首页、文章页、归档、标签、专题、About、404 全部可用
 - [ ] 移动端与桌面端布局正常；深色模式可用
 - [ ] 禁用 JavaScript 后正文完整可读
-- [ ] 国内 LCP < 2.5s，CLS < 0.1（Cloudflare 环境下实测）
-- [ ] HTTPS、HSTS、CSP 配置完成
-- [ ] `www` 301 到 apex
+- [ ] 国内 LCP < 2.5s，CLS < 0.1（GitHub Pages 环境下实测）
+- [ ] HTTPS 由 GitHub Pages 提供；CSP/HSTS 仅在未来 Cloudflare 迁移时启用
+- [ ] 未来接回 `yuanhaisu.com` 时配置 `www` 301
 
 ### GEO
 
@@ -390,9 +391,9 @@ export default defineContentConfig({
 
 1. **GitHub**：新建 `yuanhaisu/yuanhaisu` Profile README；归档旧 fork；把 `kindergarten` 设为私有。
 2. **案例仓库**：新建 `nurture-planet-case-study`，先放 README 与架构图。
-3. **Cloudflare**：创建 Pages 项目，连接博客仓库；把 `yuanhaisu.com` 的 DNS 迁到 Cloudflare。
-4. **邮箱**：申请阿里云企业邮箱免费版，配置 MX/SPF/DKIM，开通 `hi@yuanhaisu.com`。
-5. **站点**：初始化 Nuxt 4 + Nuxt Content 3，搭首页/文章页/About。
+3. **GitHub Pages**：仓库 Settings → Pages → Source 设为 GitHub Actions；推送 `main` 触发 `.github/workflows/deploy.yml`。
+4. **邮箱**：申请阿里云企业邮箱免费版，配置 MX/SPF/DKIM，开通 `hi@yuanhaisu.com`；开通前公开联系优先 GitHub。
+5. **站点**：v1 骨架、3 篇首发文章与 GitHub Pages 部署已完成，继续补充真实统计与平台 URL。
 6. **平台**：注册/完善知乎、微信公众号，统一头像与简介。
 7. **内容**：先写第 1 篇《我为什么开始「一人交付笔记」》的提纲。
 8. **监测**：注册百度统计、Cloudflare Web Analytics、百度站长/必应/GSC。
@@ -403,7 +404,7 @@ export default defineContentConfig({
 
 - 不做 ICP 备案、不买国内服务器（国内镜像 v2 再评估）
 - 不做 Artalk / Umami 自建 / listmonk / PostgreSQL
-- 不做 GitHub Pages 生产托管
+- 不做国内服务器与 ICP（国内镜像 v2 再评估）
 - 不做小红书 / 抖音（v2）
 - 不做完整双语（英文 v1.1，上线后 3 个月内）
 - 不做付费内容、广告、电商、付费社群

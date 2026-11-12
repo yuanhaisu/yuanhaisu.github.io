@@ -11,7 +11,6 @@
  *   - JSON-LD is parseable and articles carry BlogPosting + BreadcrumbList;
  *   - sitemap.xml, feed.xml, robots.txt and llms.txt are well-formed, list
  *     exactly the published content, and never leak drafts;
- *   - _headers still carries HSTS + the CSP allow-list;
  *   - Pagefind built a Chinese index for every published post;
  *   - the client content database dump excludes drafts.
  *

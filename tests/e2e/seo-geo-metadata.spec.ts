@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
-const personId = 'https://yuanhaisu.com/#person'
+const personId = 'https://yuanhaisu.github.io/#person'
 const articlePath = '/posts/fixture-manifesto'
-const articleUrl = `https://yuanhaisu.com${articlePath}`
+const articleUrl = `https://yuanhaisu.github.io${articlePath}`
 
 type JsonLdNode = Record<string, unknown>
 
@@ -35,7 +35,7 @@ function expectIso8601Date(value: unknown, label: string) {
   ).toBe(false)
 }
 
-const siteOrigin = 'https://yuanhaisu.com'
+const siteOrigin = 'https://yuanhaisu.github.io'
 
 const postPaths = [
   articlePath,
@@ -91,7 +91,7 @@ test('文章页输出唯一且字段完整的 BlogPosting JSON-LD', async ({ pag
   expect(node.mainEntityOfPage).toMatchObject({ '@id': articleUrl })
 
   expectAbsoluteUrl(node.image, 'BlogPosting.image')
-  expect(node.image).toBe('https://yuanhaisu.com/avatar.png')
+  expect(node.image).toBe('https://yuanhaisu.github.io/avatar.png')
 
   expect(node.inLanguage).toBe('zh-CN')
   expect(node.license).toBe('https://creativecommons.org/licenses/by/4.0/')
@@ -107,8 +107,8 @@ test('每个公开页面输出唯一且字段完整的 WebSite JSON-LD', async (
 
     const site = websites[0]!
     expect(site['@context']).toBe('https://schema.org')
-    expect(site['@id']).toBe('https://yuanhaisu.com/#website')
-    expect(site.url).toBe('https://yuanhaisu.com/')
+    expect(site['@id']).toBe('https://yuanhaisu.github.io/#website')
+    expect(site.url).toBe('https://yuanhaisu.github.io/')
     expect(site.name).toBe('一人交付笔记')
     expect(site.description).toBe(
       '袁海粟的个人博客，记录一个人借助 AI agent 流水线完成软件交付的真实实验。',
@@ -120,7 +120,7 @@ test('每个公开页面输出唯一且字段完整的 WebSite JSON-LD', async (
     expect(action['@type']).toBe('SearchAction')
     expect(action.target).toMatchObject({
       '@type': 'EntryPoint',
-      urlTemplate: 'https://yuanhaisu.com/search?q={search_term_string}',
+      urlTemplate: 'https://yuanhaisu.github.io/search?q={search_term_string}',
     })
     expect(action['query-input']).toBe('required name=search_term_string')
   }
@@ -132,11 +132,11 @@ test('搜索页 canonical 与 og:url 忽略查询参数', async ({ page }) => {
 
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://yuanhaisu.com/search',
+    'https://yuanhaisu.github.io/search',
   )
   await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
     'content',
-    'https://yuanhaisu.com/search',
+    'https://yuanhaisu.github.io/search',
   )
   expect(nodesOfType(await readJsonLd(page), 'WebSite')).toHaveLength(1)
 })
@@ -233,7 +233,7 @@ test('客户端导航后不残留上一页的 canonical 或 JSON-LD', async ({ p
   await expect(page.locator('link[rel="canonical"]')).toHaveCount(1)
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://yuanhaisu.com/archive',
+    'https://yuanhaisu.github.io/archive',
   )
   const nodes = await readJsonLd(page)
   expect(nodesOfType(nodes, 'BlogPosting')).toHaveLength(0)
@@ -389,7 +389,7 @@ test('文章页输出合法的 BreadcrumbList', async ({ page }) => {
   }
 
   expect(items[0]!.name).toBe('首页')
-  expect(items[0]!.item).toBe('https://yuanhaisu.com/')
+  expect(items[0]!.item).toBe('https://yuanhaisu.github.io/')
   expect(items.at(-1)!.name).toBe('测试夹具：一人交付笔记开篇')
   expect(items.at(-1)!.item).toBe(articleUrl)
 })

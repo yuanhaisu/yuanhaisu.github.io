@@ -12,7 +12,6 @@ export const SITEMAP_STATIC_ROUTES = ['/', '/about', '/archive', '/privacy']
 export const REQUIRED_FILES = [
   'index.html',
   '404.html',
-  '_headers',
   'sitemap.xml',
   'feed.xml',
   'robots.txt',

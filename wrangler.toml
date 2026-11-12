@@ -1,3 +1,5 @@
+# Archived: v1 now deploys to GitHub Pages via .github/workflows/deploy.yml.
+# Keep this file for a future Cloudflare Pages migration; it is not used by CI.
 name = "yuanhaisu-blog"
 pages_build_output_dir = ".output/public"
 compatibility_date = "2026-11-05"

@@ -1,144 +1,102 @@
 # 部署与加固
 
-状态（2026-11-07）：
+状态（2026-11-12）：
 
-- **仓库侧已实现**：Cloudflare Pages 响应头（HSTS、CSP、安全头、缓存）、`www` → apex 的账号侧配置声明、部署冒烟脚本、仓库密钥扫描。
-- **已部署**：Cloudflare Pages 项目 `yuanhaisu-blog`，预览地址 <https://yuanhaisu-blog.pages.dev>；生产构建已通过 `wrangler pages deploy` 上传。
-- **已添加自定义域**：`yuanhaisu.com` 已加入 Pages 项目，状态 `pending`，提示 “CNAME record not set”。
-- **待用户执行**：在 Cloudflare 添加 `yuanhaisu.com` 站点并到 HiChina 修改 NS；zone 生效后激活 apex、创建 `www` Proxied DNS + Bulk Redirect、开启 Always Use HTTPS、设置环境变量。仓库不保存任何凭据。
-- **已知问题**：Cloudflare Pages 对目录式 `index.html` 默认把 `/posts/foo` 308 到 `/posts/foo/`；当前 canonical 是不带尾斜杠的 URL。v1 暂接受 308，后续统一尾斜杠或在 Pages/Cloudflare 侧调整。
+- **当前托管**：GitHub Pages 用户站，地址 <https://yuanhaisu.github.io>；仓库 `yuanhaisu/yuanhaisu.github.io`，发布源为 **GitHub Actions**。
+- **构建**：`.github/workflows/deploy.yml` 在推送 `main` 时运行 `npm run validate:content` → `npm run clean:fixtures` → `npm run check:secrets` → `npm run build`，只发布 `content/` 中的正式内容。
+- **规范 URL**：`https://yuanhaisu.github.io`；`yuanhaisu.com` 保留为未来自定义域。
+- **已归档**：Cloudflare Pages 项目 `yuanhaisu-blog`、`cloudflare/_headers`、`cloudflare/www-redirect.json` 不再参与上线，只保留为未来迁移参考。
+- **已知限制**：GitHub Pages 不支持自定义响应头（无 CSP/HSTS）；目录式 URL 可能由 GitHub 301 到带尾斜杠的地址，而 canonical 不带尾斜杠；`github.io` 在中国大陆的直连稳定性不如商业 CDN。
 
 ## 当前部署
 
 | 项 | 值 |
 | --- | --- |
-| Pages 项目 | `yuanhaisu-blog` |
-| 预览地址 | <https://yuanhaisu-blog.pages.dev> |
-| 最近部署 | `https://3bb8beee.yuanhaisu-blog.pages.dev`（干净 URL 重写未生效，308 仍存在） |
-| 自定义域 | `yuanhaisu.com`：`pending`（CNAME record not set） |
-| 部署命令 | `npx wrangler pages deploy .output/public --project-name=yuanhaisu-blog --branch=main --commit-dirty=true` |
-| 项目创建 | 使用 `npx wrangler pages project create yuanhaisu-blog --production-branch main --force`（wrangler 4.158 默认委托 Workers，`--force` 仅创建时需要） |
+| 站点 | <https://yuanhaisu.github.io> |
+| 仓库 | `yuanhaisu/yuanhaisu.github.io` |
+| Pages Source | GitHub Actions |
+| 发布工作流 | `.github/workflows/deploy.yml` |
+| 构建命令 | `npm run build` |
+| 输出目录 | `.output/public` |
+| 规范 URL 配置 | `shared/site-config.mjs`，默认 `https://yuanhaisu.github.io`，可用 `NUXT_PUBLIC_SITE_ORIGIN` 覆盖 |
 
-## 仓库内产物
+## 发布流程
 
-| 文件 | 作用 |
-| --- | --- |
-| `public/_headers` | 构建时复制到 `.output/public/_headers`，由 Cloudflare Pages 解析（不会作为文件对外提供）。配置 HSTS、CSP、安全头与 `_nuxt` 缓存。 |
-| `cloudflare/www-redirect.json` | 账号侧 Bulk Redirects 条目的声明式副本，同时记录 DNS 与 Always Use HTTPS 意图。Cloudflare Pages 的 `_redirects` 只匹配路径、不支持域名级跳转，所以仓库内不能直接写 `www` 跳转。 |
-| `scripts/deployment-smoke.mjs` | 本地检查构建产物、200、HSTS/CSP、`www` 301；设置 `SMOKE_BASE_URL` 后检查在线预览或生产环境。 |
-| `scripts/check-no-secrets.mjs` | 扫描 Git 跟踪的文件，发现 `.env` 或常见凭据模式时失败；只输出路径与模式名，不输出匹配值。 |
-| `tests/static-server.mjs` | 本地 Cloudflare Pages 模拟器：应用 `_headers`，并按 `cloudflare/www-redirect.json` 模拟 `www` 301。 |
-| `tests/e2e/deployment.spec.ts` | 在构建产物 over HTTP 的 seam 上验证 200、HSTS/CSP、CSP 来源与 `www` 301。 |
+1. 在 `content/posts/`、`content/series/` 写正式内容；草稿放 `content/posts/drafts/`（被忽略）或私有仓库。
+2. 本地运行 `npm run ci`；测试夹具只在测试构建中出现，`npm run build` 不包含它们。
+3. 提交并推送 `main`。
+4. GitHub Actions 构建生产站点，上传 Pages artifact，`actions/deploy-pages` 发布。
+5. 用 `SMOKE_BASE_URL=https://yuanhaisu.github.io npm run smoke:deployment` 复验。
+
+部署工作流会先 `validate:content`（staged 夹具用于完整护栏），随后 `clean:fixtures`，再执行生产构建；不会把测试夹具发布到线上。
+
+## 环境变量
+
+在仓库 **Settings → Secrets and variables → Actions → Variables** 配置；工作流通过 `vars.*` 注入构建。所有 `NUXT_PUBLIC_*` 都是公开值，不是密钥。
+
+| 变量 | 作用 | 未设置时 |
+| --- | --- | --- |
+| `NUXT_PUBLIC_SITE_ORIGIN` | 切换 canonical/JSON-LD/sitemap/RSS 的源 | `https://yuanhaisu.github.io` |
+| `NUXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN` | Cloudflare Web Analytics | 占位 token，统计不生效 |
+| `NUXT_PUBLIC_BAIDU_ANALYTICS_ID` | 百度统计 | 占位 ID，统计不生效 |
+| `NUXT_PUBLIC_GISCUS_*` | 覆盖 Giscus 仓库/分类 | `yuanhaisu/yuanhaisu.github.io` + Announcements 的真实 ID |
+| `NUXT_PUBLIC_ZHIHU_URL` | 知乎主页，进入 About 与 `sameAs` | 显示占位，不进入 `sameAs` |
+| `NUXT_PUBLIC_WECHAT_MP_URL` | 公众号入口，进入 About 与 `sameAs` | 显示占位，不进入 `sameAs` |
+
+真实统计 ID 与平台 URL 未配置时构建仍会成功，但对应功能不完整。
 
 ## 本地验证
 
 ```bash
-npm run ci                   # 内容、密钥、构建、产物、内链、Playwright、部署冒烟
-npm run build                # 生成 .output/public
-npm test                     # Playwright：页面、无 JS、部署头与 www 301
+npm run ci                   # 内容、密钥、测试构建、产物、内链、Playwright、部署冒烟
+npm run build                # 生产构建（只含 3 篇正式文章）
 npm run validate:artifacts   # JSON-LD、sitemap、RSS、robots、llms.txt、Pagefind
-npm run check:links          # 公开路由 200、未知路由 404、www 301
-npm run smoke:deployment     # 部署冒烟（本地构建产物）
+npm run check:links          # 公开路由 200、未知路由 404、草稿隔离
+npm run smoke:deployment     # 本地构建产物：200、404、canonical、无 _headers
 npm run check:secrets        # 仓库密钥扫描
 ```
 
-本地冒烟通过只代表仓库侧配置正确。DNS、证书、Always Use HTTPS 与 `www` 跳转必须由 Cloudflare 账号完成。完整的仓库侧/内容/账号侧状态见[上线验收清单](launch-checklist.md)。
-
-## Cloudflare 账号侧配置（blocked for user）
-
-以下步骤需要登录 Cloudflare 账号，仓库与 CI 都无法代做。
-
-### 1. Pages 项目
-
-- 项目已创建：`yuanhaisu-blog`，当前通过 `wrangler pages deploy` 直接上传构建产物，尚未连接 GitHub 自动部署。
-- 构建命令：`npm run build`
-- 构建输出目录：`.output/public`
-- 环境变量：`NODE_VERSION=22`（不要添加任何密钥；本项目不需要构建期密钥）
-- 框架预设：None（纯静态站点）
-- 如需 Git 集成：在 Pages 项目 Settings → Builds & deployments 连接 `yuanhaisu/blog`，生产分支 `main`，构建命令与输出目录同上。
-
-### 2. 自定义域名与 HTTPS
-
-- apex `yuanhaisu.com` 已加入 Pages 自定义域，当前 `pending`；需要先把 `yuanhaisu.com` 添加到 Cloudflare 账号并改 NS，Pages 才能完成验证。
-- 在 Cloudflare Dashboard → Add a site → `yuanhaisu.com`（Free 计划）→ 查看 Cloudflare 分配的两条 NS。
-- 在阿里云/HiChina 域名控制台把 `dns1.hichina.com` / `dns2.hichina.com` 替换为这两条 NS；等待 zone 状态变为 Active。
-- zone 生效后，在 Pages 项目的 Custom domains 里激活 `yuanhaisu.com`，按提示创建 CNAME（Cloudflare 支持 apex CNAME flattening）。
-- `www.yuanhaisu.com` **不要**接入 Pages 自定义域名；它由第 3 步的代理 DNS + Bulk Redirect 处理。
-- Cloudflare 会自动签发并续期边缘证书；等待证书状态为 Active。
-- 进入 **SSL/TLS → Edge Certificates → Always Use HTTPS**，设为 **On**。这是“强制 HTTPS”的账号侧开关；仓库内只能通过 HSTS 告诉浏览器以后只用 HTTPS。
-- 不要在 Zone 级再次开启 HSTS，否则会和 `_headers` 的 HSTS 合并成重复头；本项目用 `_headers` 统一管理。
-- 可选：开启 Automatic HTTPS Rewrites。
-
-### 3. `www` → apex 301
-
-Cloudflare 官方推荐 Bulk Redirects（或等价的单条 Redirect Rule），因为 Pages 的 `_redirects` 不支持域名级匹配：
-
-1. **Bulk Redirects → Create a bulk redirect list**，条目与 `cloudflare/www-redirect.json` 的 `www_redirect` 保持一致：
-   - Source URL: `www.yuanhaisu.com`
-   - Target URL: `https://yuanhaisu.com`
-   - Status: `301`
-   - 勾选：Preserve query string、Subpath matching、Preserve path suffix、Include subdomains
-2. 创建并启用使用该列表的 Bulk Redirect rule。
-3. **DNS**：为 `www` 添加 **Proxied（橙色云）** 记录。官方示例使用占位 IPv4 `192.0.2.1`，也可以使用指向 apex 的 CNAME；必须是 Proxied，否则请求不经过 Cloudflare 边缘，跳转不会执行。
-4. 验证：
+在线冒烟：
 
 ```bash
-curl -sI https://www.yuanhaisu.com/ | head -n 5
-# 期望 HTTP/2 301，location: https://yuanhaisu.com/
+SMOKE_BASE_URL=https://yuanhaisu.github.io npm run smoke:deployment
 ```
 
-单条 Redirect Rule 的等价写法：匹配表达式 `http.host eq "www.yuanhaisu.com"`，动态目标 `concat("https://yuanhaisu.com", http.request.uri.path)`，状态 301，保留查询串。
+检查 HTTPS、200、canonical 指向当前源、未知路径 404、`http://` 跳转到 `https://`。
 
-修改账号侧跳转设置时，同步更新 `cloudflare/www-redirect.json`，本地冒烟会按该文件模拟并校验路径与查询串保留。
+## GitHub Pages 的限制
 
-### 4. 预览部署 HTTPS
+- **自定义响应头不可用**：GitHub Pages 不解析 `_headers`，也不允许设置 CSP/HSTS。`cloudflare/_headers` 已移到 `cloudflare/`，不进入构建产物；如果未来安全头成为硬要求，需要切回 Cloudflare Pages 或在前面加代理。
+- **目录 URL 尾斜杠**：GitHub Pages 对 `posts/foo/index.html` 通常会把 `/posts/foo` 301 到 `/posts/foo/`，而 canonical 是不带尾斜杠的地址。v1 接受这一跳转；如果后续要统一，可把 canonical 改为尾斜杠并同步站内链接。
+- **国内访问**：`github.io` 的连通性不稳定；国内触达继续依赖知乎/微信公众号，国内镜像在 v2 评估。
+- **构建配额**：GitHub Actions 免费额度足够当前更新频率；Pagefind 索引在构建期生成，不依赖服务端。
 
-- Cloudflare Pages 会为每次非生产分支构建生成 `https://<hash>.yuanhaisu-blog.pages.dev` 预览地址，HTTPS 自动生效，无需额外证书。
-- 在 Pages 项目的 Settings → Builds & deployments 中确认生产分支与预览分支策略。预览地址默认公开；如需私密预览，可加 Cloudflare Access，但此时冒烟脚本需要人工登录，不应把 Access 凭据写入仓库。
-- 预览地址冒烟：
+## 未来接回 `yuanhaisu.com`
 
-```bash
-SMOKE_BASE_URL=https://<preview>.yuanhaisu-blog.pages.dev npm run smoke:deployment
-```
+域名与 Cloudflare 配置已保留，迁移步骤：
 
-预览地址不是 `yuanhaisu.com`，因此默认只检查 HTTPS、200、HSTS/CSP；`www` 与强制 HTTPS 的检查只在生产域名执行。
+1. 在 Cloudflare 添加 `yuanhaisu.com` 站点，把 HiChina 的 NS 换成 Cloudflare 分配的两条，等待 zone Active。
+2. 重新启用 Cloudflare Pages 项目（或把 GitHub Pages 放在 Cloudflare 代理后），把 `cloudflare/_headers` 复制回 `public/_headers`。
+3. 在仓库 Variables 设置 `NUXT_PUBLIC_SITE_ORIGIN=https://yuanhaisu.com`，重新构建；所有 canonical、JSON-LD `@id`、sitemap、RSS、llms.txt 会一起切换。
+4. 为 `www` 创建 Proxied DNS + Bulk Redirect，条目与 `cloudflare/www-redirect.json` 一致，并启用 Always Use HTTPS。
+5. 更新平台稿、GitHub Profile、About 与 `sameAs` 中的 URL；对旧 github.io 地址做 301 或在平台侧改链。
+6. 迁移后运行 `SMOKE_BASE_URL=https://yuanhaisu.com npm run smoke:deployment`，并重新提交 sitemap 到搜索引擎。
 
-### 5. 生产冒烟
+`cloudflare/www-redirect.json` 的状态是 `archived`，本地测试仍会校验它的 `www` 301 行为，但它不参与当前 GitHub Pages 上线。
 
-账号侧配置完成后执行：
+## 归档文件
 
-```bash
-SMOKE_BASE_URL=https://yuanhaisu.com npm run smoke:deployment
-```
-
-它检查：
-
-- `https://yuanhaisu.com/` 返回 200，且带 HSTS 与 CSP；
-- `http://yuanhaisu.com/` 跳转到 `https://yuanhaisu.com/`（Always Use HTTPS）；
-- `https://www.yuanhaisu.com/` 返回 301 且 `location` 指向 `https://yuanhaisu.com/`。
-
-## 验收项与责任边界
-
-| 验收项 | 仓库侧 | 账号侧（用户） |
-| --- | --- | --- |
-| `www.yuanhaisu.com` 301 到 `https://yuanhaisu.com` | 配置声明、本地模拟与测试 | Proxied DNS + Bulk Redirect 实际生效 |
-| 强制 HTTPS、响应含 HSTS | `_headers` 中的 HSTS | Always Use HTTPS、证书签发 |
-| CSP 不阻断 Giscus、统计、字体、搜索 | `_headers` 中的 CSP 与来源白名单 | 无（部署后自动生效） |
-| Cloudflare Pages 预览可 HTTPS 访问 | 无（平台行为） | 创建 Pages 项目并触发预览构建 |
-| 部署冒烟检查 200、301、HSTS/CSP | 本地冒烟脚本与 Playwright 测试 | 提供预览/生产 URL 后运行在线冒烟 |
-| 仓库与构建日志不含密钥 | 密钥扫描脚本、`.gitignore` | 只在 Dashboard 配置环境变量，不粘贴密钥到日志 |
-
-## CSP 维护
-
-- Nuxt 静态产物包含内联 import map 与 `window.__NUXT__` 引导脚本，因此 `script-src` 需要 `'unsafe-inline'`；如果未来 Nuxt 提供 nonce/hash 方案，可再收紧。
-- Pagefind 需要 `script-src 'wasm-unsafe-eval'` 与 `worker-src 'self' blob:`。
-- Giscus 允许 `https://giscus.app`（脚本与 iframe）；统计允许 Cloudflare Web Analytics 与百度统计域名；字体完全自托管（`font-src 'self'`），不再需要 Google Fonts 来源。
-- 百度统计只在访客明确同意后加载；`https://hm.baidu.com` 保留在 `script-src`/`connect-src` 白名单中，但未同意前不会发起请求。
-- 新增第三方服务时，同时更新 `public/_headers`、`tests/e2e/deployment.spec.ts`、`scripts/deployment-smoke.mjs` 与 `scripts/validate-artifacts.mjs`（产物分组校验会检查 CSP 来源）的允许来源断言，避免“配置存在但实际被 CSP 拦截”。
+| 文件 | 作用 |
+| --- | --- |
+| `cloudflare/_headers` | 未来 Cloudflare Pages 的 HSTS、CSP、安全头与 `_nuxt` 缓存配置；当前不部署 |
+| `cloudflare/www-redirect.json` | 未来 `www` → apex 301 的 Bulk Redirect 声明；当前不生效 |
+| `scripts/deployment-smoke.mjs` | 本地/在线冒烟；当前检查 GitHub Pages 行为 |
+| `tests/static-server.mjs` | 本地静态服务器，模拟 GitHub Pages 的目录 index 与 404；不应用自定义头 |
+| `tests/guardrails/cloudflare-fallback.spec.ts` | 校验归档的 Cloudflare 配置仍然合法 |
 
 ## 密钥与日志
 
 - 仓库不保存 Cloudflare、GitHub、百度统计等凭据；`.env` 与 `.env.*` 已被 `.gitignore` 忽略（`.env.example` 除外）。
-- Pages 构建只需 `NODE_VERSION`，不需要密钥；如未来需要构建期变量，在 Cloudflare Dashboard 配置，不写入仓库。
+- Pages 构建不需要密钥；`NUXT_PUBLIC_*` 是公开配置，仍建议通过仓库 Variables 管理，不写进源码。
 - 冒烟脚本只请求公开 URL，不读取、不打印任何凭据。
-- 提交前运行 `npm run check:secrets`；CI 也应执行同一脚本。
+- 提交前运行 `npm run check:secrets`；CI 执行同一脚本。

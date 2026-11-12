@@ -1,5 +1,6 @@
 {
-  "description": "Cloudflare account-side deployment config for yuanhaisu.com. Cloudflare Pages _redirects cannot match hosts, so the www-to-apex redirect is created as a Bulk Redirects list entry (or an equivalent Redirect Rule) in the Cloudflare account. See docs/deployment.md. No credentials or account IDs belong in this file.",
+  "status": "archived",
+  "description": "Archived Cloudflare account-side config for a future yuanhaisu.com launch. v1 is hosted on GitHub Pages at https://yuanhaisu.github.io; none of these rules are active. To migrate back, enable the Cloudflare zone, activate the Pages custom domain, recreate the Bulk Redirect, and switch NUXT_PUBLIC_SITE_ORIGIN to https://yuanhaisu.com. Cloudflare Pages _redirects cannot match hosts, so the www-to-apex redirect is a Bulk Redirects list entry (or an equivalent Redirect Rule). See docs/deployment.md. No credentials or account IDs belong in this file.",
   "zone": "yuanhaisu.com",
   "pages_project": "yuanhaisu-blog",
   "canonical_origin": "https://yuanhaisu.com",

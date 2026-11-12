@@ -13,13 +13,13 @@ test('文章页包含 Giscus 配置与国内读者讨论入口', async ({
 
   const section = html.match(/<section[^>]*id="comments"[^>]*>/)
   expect(section, '文章页缺少评论容器').not.toBeNull()
-  expect(section![0]).toContain('data-giscus-repo="yuanhaisu/blog"')
   expect(section![0]).toContain(
-    'data-giscus-repo-id="REPLACE_WITH_GISCUS_REPO_ID"',
+    'data-giscus-repo="yuanhaisu/yuanhaisu.github.io"',
   )
+  expect(section![0]).toContain('data-giscus-repo-id="R_kgDOVkEuGw"')
   expect(section![0]).toContain('data-giscus-category="Announcements"')
   expect(section![0]).toContain(
-    'data-giscus-category-id="REPLACE_WITH_GISCUS_CATEGORY_ID"',
+    'data-giscus-category-id="DIC_kwDOVkEuG84DK8F_"',
   )
 
   // 评论脚本不进入首屏 HTML，只保留配置。
@@ -54,15 +54,15 @@ test('评论在点击交互后才加载 Giscus 脚本', async ({ page }) => {
   await loadButton.dispatchEvent('click')
 
   await expect(script).toHaveCount(1)
-  await expect(script).toHaveAttribute('data-repo', 'yuanhaisu/blog')
   await expect(script).toHaveAttribute(
-    'data-repo-id',
-    'REPLACE_WITH_GISCUS_REPO_ID',
+    'data-repo',
+    'yuanhaisu/yuanhaisu.github.io',
   )
+  await expect(script).toHaveAttribute('data-repo-id', 'R_kgDOVkEuGw')
   await expect(script).toHaveAttribute('data-category', 'Announcements')
   await expect(script).toHaveAttribute(
     'data-category-id',
-    'REPLACE_WITH_GISCUS_CATEGORY_ID',
+    'DIC_kwDOVkEuG84DK8F_',
   )
   await expect(script).toHaveAttribute('data-mapping', 'pathname')
   await expect(script).toHaveAttribute('data-lang', 'zh-CN')
@@ -97,7 +97,7 @@ test('Giscus 加载失败时显示 GitHub Discussions 兜底链接', async ({
   await expect(failure).toBeVisible()
   await expect(
     failure.getByRole('link', { name: 'GitHub Discussions' }),
-  ).toHaveAttribute('href', 'https://github.com/yuanhaisu/blog/discussions')
+  ).toHaveAttribute('href', 'https://github.com/yuanhaisu/yuanhaisu.github.io/discussions')
 })
 
 test.describe('禁用 JavaScript', () => {
@@ -118,7 +118,7 @@ test.describe('禁用 JavaScript', () => {
     expect(fallback, '缺少 noscript 评论兜底').not.toBeNull()
     expect(fallback![1]).toContain('评论需要启用 JavaScript 才能加载。')
     expect(fallback![1]).toContain(
-      'https://github.com/yuanhaisu/blog/discussions',
+      'https://github.com/yuanhaisu/yuanhaisu.github.io/discussions',
     )
 
     // 评论容器与国内读者入口本身由服务端渲染，无 JavaScript 时仍可读。

@@ -11,6 +11,7 @@
 - 内容管理选择 Markdown + Git，不做自建后台。
 - GEO 要求正文以纯 HTML 输出，不依赖 JavaScript 才能被 agent 读取。
 - 2026-11-04 转向：GitHub 为内容源，Cloudflare Pages 托管，`yuanhaisu.com` 为规范 URL；v1 中文 canonical，英文 v1.1。
+- 2026-11-12 更新：v1 托管改为 GitHub Pages，规范 URL 改为 `https://yuanhaisu.github.io`；见 ADR-0008。技术栈与内容策略不变。
 
 ## 决策
 

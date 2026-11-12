@@ -1,4 +1,7 @@
-# Cloudflare Pages response headers for https://yuanhaisu.com
+# Archived Cloudflare Pages response headers for a future custom-domain launch.
+# GitHub Pages (the current v1 host) does not support custom response headers,
+# so this file is intentionally outside public/ and never enters .output/public.
+# To migrate back to Cloudflare Pages, copy it to public/_headers.
 # https://developers.cloudflare.com/pages/configuration/headers/
 #
 # CSP notes:

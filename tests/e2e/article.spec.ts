@@ -20,7 +20,7 @@ test('文章页渲染中文正文、标题、日期、作者与 canonical', asyn
   await expect(page.getByText('作者：袁海粟')).toBeVisible()
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    `https://yuanhaisu.com${articlePath}`,
+    `https://yuanhaisu.github.io${articlePath}`,
   )
   await expect(page.locator('article')).toContainText(
     '过去十一年，我主要做后端与分布式系统',

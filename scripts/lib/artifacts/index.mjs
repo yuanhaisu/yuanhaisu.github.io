@@ -9,7 +9,6 @@ import {
   resetValidationState,
 } from './context.mjs'
 import { validateFeed } from './feed.mjs'
-import { validateHeaders } from './headers.mjs'
 import { validateLlms } from './llms.mjs'
 import { validatePage } from './pages.mjs'
 import { validatePagefind } from './pagefind.mjs'
@@ -73,7 +72,6 @@ export async function validateArtifacts({
   await group('feed.xml', () => validateFeed(rootDir, posts))
   await group('robots.txt', () => validateRobots(rootDir))
   await group('llms.txt', () => validateLlms(rootDir, posts))
-  await group('_headers', () => validateHeaders(rootDir))
   await group('Pagefind 中文索引', () => validatePagefind(rootDir, posts))
   await group('草稿隔离', () => validateContentDump(rootDir))
 

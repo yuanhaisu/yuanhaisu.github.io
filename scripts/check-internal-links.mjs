@@ -9,8 +9,7 @@
  *   - every sitemap URL, discovery artifact, and linked asset returns 200;
  *   - every internal href/src found in server-rendered HTML returns 200;
  *   - an unknown path returns the generated 404 page with status 404;
- *   - draft routes are never reachable;
- *   - a www Host request returns 301 to the apex origin with path and query.
+ *   - draft routes are never reachable.
  *
  * Usage: node scripts/check-internal-links.mjs [--root .output/public] [--content content]
  */
@@ -153,8 +152,7 @@ export async function checkInternalLinks({
   failures.length = 0
   checks.length = 0
 
-  const redirectConfigPath = resolve('cloudflare/www-redirect.json')
-  const server = createStaticServer(rootDir, { redirectConfigPath })
+  const server = createStaticServer(rootDir)
   server.listen(0, '127.0.0.1')
   await once(server, 'listening')
   const address = server.address()
@@ -264,23 +262,6 @@ export async function checkInternalLinks({
       '草稿路由不可访问',
       reachableDrafts.length === 0,
       `${draftRoutes.length} 条草稿`,
-    )
-
-    const wwwPath = '/about?from=www'
-    const www = await doRequest(wwwPath, { host: 'www.yuanhaisu.com' })
-    const expectedLocation = `${SITE_ORIGIN}/about?from=www`
-    const location = www.headers.location ?? ''
-    const redirectOk =
-      www.status === 301 && location === expectedLocation
-    if (!redirectOk) {
-      fail(
-        `www 请求应 301 到 ${expectedLocation}，实际 ${www.status} ${location || '(无 Location)'}`,
-      )
-    }
-    group(
-      'www 301 到 apex 并保留路径与查询',
-      redirectOk,
-      `${www.status} ${location}`,
     )
   } finally {
     await new Promise((resolvePromise) => server.close(resolvePromise))

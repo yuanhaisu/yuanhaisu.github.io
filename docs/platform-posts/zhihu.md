@@ -1,7 +1,7 @@
 ---
 platform: 知乎
 status: draft
-canonical: https://yuanhaisu.com/posts/one-person-delivery-experiment-01-multi-agent-saas
+canonical: https://yuanhaisu.github.io/posts/one-person-delivery-experiment-01-multi-agent-saas
 publish_after: 博客上线后 3 天内
 ---
 
@@ -116,6 +116,6 @@ worker 拿到的是契约、相关文件范围和验收条件，不是「你看�
 
 完整版（含架构图、流水线图和多租户隔离图）在个人博客：
 
-https://yuanhaisu.com/posts/one-person-delivery-experiment-01-multi-agent-saas
+https://yuanhaisu.github.io/posts/one-person-delivery-experiment-01-multi-agent-saas
 
 下一篇会拆 AI 工程落地的三层栈：模型服务、LLM 工具编排、数据与算法。也欢迎关注公众号「一人交付笔记」。

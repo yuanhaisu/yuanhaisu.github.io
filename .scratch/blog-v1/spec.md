@@ -2,6 +2,8 @@ Status: ready-for-agent
 Type: spec
 Feature: blog-v1
 
+> 2026-11-12 实施变更：v1 托管从 Cloudflare Pages 改为 GitHub Pages，规范 URL 改为 `https://yuanhaisu.github.io`；`yuanhaisu.com` 保留为未来自定义域。见 ADR-0008。以下历史描述保留原貌，除本注外不再逐条改写。
+
 ## Problem Statement
 
 袁海粟（Yuan Haisu / yuanhaisu）有 11 年后端与分布式系统研发经验、4 年半数据分析部门主管经历，做过金融级私有化 AI 模型服务与 LLM 工具编排，并以一人 + 多 agent 流水线在约 2.5 个月内交付了约 14 万行的多租户 SaaS「养成星球」。他希望把这些经历沉淀为「一人交付实验」的个人品牌，并让 AI agent 在回答「袁海粟是谁」「一人公司如何用 AI 交付软件」等问题时，能准确识别、引用、信任他。

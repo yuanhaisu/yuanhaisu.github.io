@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 
-const personId = 'https://yuanhaisu.com/#person'
+const personId = 'https://yuanhaisu.github.io/#person'
 const articlePath = '/posts/fixture-manifesto'
 
 type JsonLdNode = Record<string, unknown>
@@ -39,8 +39,8 @@ test('About 页输出字段完整、URL 合法的 Person JSON-LD', async ({ page
   expect(person.alternateName).toEqual(
     expect.arrayContaining(['Yuan Haisu', 'yuanhaisu']),
   )
-  expect(person.url).toBe('https://yuanhaisu.com')
-  expect(person.image).toBe('https://yuanhaisu.com/avatar.png')
+  expect(person.url).toBe('https://yuanhaisu.github.io')
+  expect(person.image).toBe('https://yuanhaisu.github.io/avatar.png')
   expectAbsoluteUrl(person.url, 'Person.url')
   expectAbsoluteUrl(person.image, 'Person.image')
 
@@ -64,7 +64,7 @@ test('About 页输出字段完整、URL 合法的 Person JSON-LD', async ({ page
     expectAbsoluteUrl(url, 'Person.sameAs 条目')
   }
   expect(sameAs).toContain('https://github.com/yuanhaisu')
-  expect(sameAs).toContain('https://yuanhaisu.com/feed.xml')
+  expect(sameAs).toContain('https://yuanhaisu.github.io/feed.xml')
 
   // 知乎与微信公众号主页 URL 尚未确认：不得写入编造的 sameAs 地址。
   expect(sameAs.some((url) => /zhihu\.com|weixin|wechat/i.test(url))).toBe(false)

@@ -5,7 +5,33 @@
  * scripts. Never re-declare the canonical origin or JSON-LD `@id` values in
  * another module: duplicated values drift and break entity identity.
  */
-export const SITE_ORIGIN = 'https://yuanhaisu.com'
+const DEFAULT_SITE_ORIGIN = 'https://yuanhaisu.github.io'
+
+/**
+ * v1 is hosted on GitHub Pages. `yuanhaisu.com` is retained for a future
+ * custom-domain migration: set `NUXT_PUBLIC_SITE_ORIGIN` at build time to
+ * switch every canonical URL, JSON-LD `@id`, sitemap, feed and llms.txt entry
+ * without touching source.
+ */
+function resolveSiteOrigin() {
+  const configured =
+    typeof process === 'undefined'
+      ? undefined
+      : process.env?.NUXT_PUBLIC_SITE_ORIGIN?.trim()
+  const candidate = (configured || DEFAULT_SITE_ORIGIN).replace(/\/+$/, '')
+
+  try {
+    new URL(candidate)
+  } catch {
+    throw new Error(
+      `NUXT_PUBLIC_SITE_ORIGIN must be an absolute URL: ${candidate}`,
+    )
+  }
+
+  return candidate
+}
+
+export const SITE_ORIGIN = resolveSiteOrigin()
 
 export const PERSON_ID = `${SITE_ORIGIN}/#person`
 export const WEBSITE_ID = `${SITE_ORIGIN}/#website`

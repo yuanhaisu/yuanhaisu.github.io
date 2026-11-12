@@ -1,6 +1,6 @@
 # 一人交付笔记
 
-`yuanhaisu.com` 的设计与实施文档。
+`https://yuanhaisu.github.io` 的设计与实施文档。`yuanhaisu.com` 保留为未来自定义域。
 
 - 作者：袁海粟（Yuan Haisu / yuanhaisu）
 - 定位：一人公司的 AI 交付实验
@@ -9,7 +9,7 @@
 
 ## 策略
 
-GitHub 内容源 → Cloudflare Pages → `yuanhaisu.com`；中文 canonical；国外 GEO 优先、英文 v1.1；国内通过知乎 + 微信公众号分发。v1 不做 ICP、不买国内服务器；国内镜像 v2 再评估。
+GitHub 内容源 → GitHub Actions → GitHub Pages → `https://yuanhaisu.github.io`；中文 canonical；国外 GEO 优先、英文 v1.1；国内通过知乎 + 微信公众号分发。v1 不做 ICP、不买国内服务器；国内镜像 v2 再评估。`yuanhaisu.com` 保留，未来可切回（改 `NUXT_PUBLIC_SITE_ORIGIN` 即可）。
 
 ## 文档
 
@@ -27,6 +27,7 @@ GitHub 内容源 → Cloudflare Pages → `yuanhaisu.com`；中文 canonical；�
   - [0005 v1 范围与上线门槛（v1 已由 0007 取代）](docs/adr/0005-v1-scope-and-launch-gate.md)
   - [0006 GEO 与授权](docs/adr/0006-geo-and-licensing.md)
   - [0007 GitHub 优先与分发策略](docs/adr/0007-github-first-and-distribution.md)
+  - [0008 GitHub Pages 作为 v1 托管](docs/adr/0008-github-pages-v1.md)
 
 ## 本地开发
 
@@ -34,7 +35,7 @@ GitHub 内容源 → Cloudflare Pages → `yuanhaisu.com`；中文 canonical；�
 
 ```bash
 npm install            # 安装依赖
-npm run dev            # 生产内容（当前 0 篇，直到写入首发文章）
+npm run dev            # 生产内容（当前 3 篇正式文章）
 npm run dev:fixtures   # 带测试夹具的本地开发
 npm run build          # 生产构建，不包含测试夹具
 npm run build:test     # 测试构建：先 stage tests/fixtures/content/，再构建
@@ -61,23 +62,23 @@ NUXT_PUBLIC_BAIDU_ANALYTICS_ID=<baidu-hm-site-id>
 npm run build
 ```
 
-在 Cloudflare Pages 项目的环境变量中设置同名的 `NUXT_PUBLIC_*` 变量即可。`.env.example` 列出了这些变量。
+在 GitHub 仓库的 **Settings → Secrets and variables → Actions → Variables** 中设置同名的 `NUXT_PUBLIC_*` 变量，部署工作流会注入构建。`.env.example` 列出了这些变量。
 
 ## 评论配置（Giscus）
 
 文章页的评论基于 Giscus 与 GitHub Discussions，评论内容不进入本站仓库，也没有评论数据库或用户系统。评论只在评论区进入视口或读者点击「加载评论」后才加载；主题跟随站点当前的 `<html data-theme>`（即主题切换按钮与 `localStorage` 的选择，未设置时回退到 `prefers-color-scheme`），并通过 `MutationObserver` 在主题变化后重新加载 iframe。国内读者会看到知乎/公众号讨论入口。禁用 JavaScript 时页面显示 `<noscript>` 说明与 GitHub Discussions 链接。
 
-Giscus 配置不是密钥，但仓库里只有占位值。先在 `yuanhaisu/blog` 仓库启用 Discussions，创建 **Announcements** 类型的分类，再在 <https://giscus.app/zh-CN> 生成配置：
+Giscus 配置不是密钥。仓库 `yuanhaisu/yuanhaisu.github.io` 已启用 Discussions，并创建了 **Announcements** 分类；`app/utils/giscus.ts` 中已写入真实值。需要覆盖时使用：
 
 ```bash
-NUXT_PUBLIC_GISCUS_REPO=yuanhaisu/blog
-NUXT_PUBLIC_GISCUS_REPO_ID=<giscus 生成器给出的 data-repo-id>
+NUXT_PUBLIC_GISCUS_REPO=yuanhaisu/yuanhaisu.github.io
+NUXT_PUBLIC_GISCUS_REPO_ID=R_kgDOVkEuGw
 NUXT_PUBLIC_GISCUS_CATEGORY=Announcements
-NUXT_PUBLIC_GISCUS_CATEGORY_ID=<giscus 生成器给出的 data-category-id>
+NUXT_PUBLIC_GISCUS_CATEGORY_ID=DIC_kwDOVkEuG84DK8F_
 npm run build
 ```
 
-未设置这些变量时构建仍会成功，并保留 `app/utils/giscus.ts` 中的占位配置；上线前必须在 Cloudflare Pages 的环境变量中填入真实值，否则 Giscus 无法创建讨论。`public/_headers` 的 CSP 已允许 `https://giscus.app` 的脚本与 iframe。
+默认值已指向 `yuanhaisu/yuanhaisu.github.io` 仓库的 **Announcements** 分类，`repoId` 与 `categoryId` 也是真实值；仍可用 `NUXT_PUBLIC_GISCUS_*` 覆盖。GitHub Pages 不支持自定义响应头，`cloudflare/_headers` 仅作为未来 Cloudflare 迁移的归档配置，不进入构建产物。
 
 ## 知乎 / 微信公众号入口
 
@@ -110,33 +111,35 @@ Markdown 文章中的图片由 `shared/rehype-lazy-images.mjs` 统一加上 `loa
 </picture>
 ```
 
-## 部署（Cloudflare Pages）
+## 部署（GitHub Pages）
 
-- 构建命令：`npm run generate`
+- 站点地址：`https://yuanhaisu.github.io`
+- 仓库：`yuanhaisu/yuanhaisu.github.io`（用户站根路径）
+- 构建命令：`npm run build`
 - 构建输出目录：`.output/public`
-- 环境变量：`NODE_VERSION=22`
-- 框架预设：None（纯静态站点）
+- 发布方式：`.github/workflows/deploy.yml` 在推送 `main` 时通过 GitHub Actions 构建并发布；Pages 的 Source 为 **GitHub Actions**
+- 构建期变量：在仓库 **Settings → Secrets and variables → Actions → Variables** 配置 `NUXT_PUBLIC_*`，工作流会注入
 
-`wrangler.toml` 已声明 `pages_build_output_dir = ".output/public"`；也可以在项目根目录执行 `npx wrangler pages deploy .output/public` 手动发布。真实预览域名由 Cloudflare Pages 项目生成，需要账号侧配置，仓库中不保存任何凭据。
+`npm run build` 只构建 `content/` 中的正式内容；测试夹具只在 `npm run build:test` / CI 中 staged，部署工作流不会包含它们。
 
-部署加固细节（`www` 301、Always Use HTTPS、HSTS/CSP、预览 HTTPS 与冒烟检查）见[部署与加固](docs/deployment.md)。上线内容、账号侧阻塞项与验收状态见[上线验收清单](docs/launch-checklist.md)。仓库侧可先运行：
+部署细节与未来接回 `yuanhaisu.com` 的迁移路径见[部署与加固](docs/deployment.md)。上线内容、账号侧待办与验收状态见[上线验收清单](docs/launch-checklist.md)。仓库侧可先运行：
 
 ```bash
-npm run smoke:deployment   # 检查构建产物、200、HSTS/CSP 与 www 301（本地模拟）
+npm run smoke:deployment   # 检查构建产物、200、404 与 canonical（本地模拟）
 npm run check:secrets      # 检查仓库不含凭据与 .env
 ```
 
-账号侧的 Pages 项目、DNS、Always Use HTTPS 与 `www` Bulk Redirect 仍需在 Cloudflare Dashboard 完成，且无法由仓库代做。
+GitHub Pages 不支持自定义响应头，因此 v1 不承诺 CSP/HSTS；`cloudflare/_headers` 与 `cloudflare/www-redirect.json` 是未来迁移用的归档配置，不参与当前上线。
 
 ## 当前状态
 
-站点骨架已实现：Nuxt 4 + Nuxt Content 3 静态生成、首页、文章/标签/专题/归档页、无 JavaScript 可读的正文与 Playwright 测试。仓库侧上线门禁（内容护栏、测试构建、JSON-LD/sitemap/RSS/robots/llms.txt、内链、Pagefind、HSTS/CSP、`www` 跳转声明、冒烟与密钥扫描）已通过；生产内容已有 **3 篇正式文章初稿**，7 篇测试夹具只在测试/CI 时 staged；2 篇平台稿草稿已写。Cloudflare Pages 预览已上线：<https://yuanhaisu-blog.pages.dev>；apex `yuanhaisu.com` 自定义域仍是 `pending`，等待 Cloudflare zone + HiChina NS。真实统计/Giscus ID 与 `www` 跳转仍待账号侧完成，详见[上线验收清单](docs/launch-checklist.md)。
+站点已从 Cloudflare Pages 预览迁移到 GitHub Pages：仓库重命名为 `yuanhaisu/yuanhaisu.github.io`，Pages 构建源切换为 GitHub Actions，canonical/JSON-LD/sitemap/RSS/llms.txt 全部指向 `https://yuanhaisu.github.io`。生产内容有 **3 篇正式文章初稿**，7 篇测试夹具只在测试/CI 时 staged；2 篇平台稿草稿已写。Giscus 已指向真实仓库与 Announcements 分类；统计 ID、平台 URL 与平台稿发布仍待账号侧完成。详见[上线验收清单](docs/launch-checklist.md)。
 
 ## 关键约束
 
 - 每周 5–10 小时；v1 约 85–105 小时，2.5–3.5 个月
-- 域名 `yuanhaisu.com`；站名「一人交付笔记」；GitHub `github.com/yuanhaisu`
-- Nuxt 4.6 + Nuxt Content 3.16，Markdown + Git，Cloudflare Pages
+- 域名 `yuanhaisu.com` 保留；v1 站点 `https://yuanhaisu.github.io`；站名「一人交付笔记」；GitHub `github.com/yuanhaisu`
+- Nuxt 4.6 + Nuxt Content 3.16，Markdown + Git，GitHub Pages
 - v1 中文 canonical；英文 v1.1 在上线后 3 个月内完成
 - 首发 3 篇中文博客 + 2 篇中文平台文章
 - 评论 Giscus；统计 Cloudflare Web Analytics + 百度统计；搜索 Pagefind；Newsletter 公众号

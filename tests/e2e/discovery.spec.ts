@@ -4,7 +4,7 @@ import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { parseFrontmatter } from '../../shared/frontmatter.mjs'
 
-const siteUrl = 'https://yuanhaisu.com'
+const siteUrl = 'https://yuanhaisu.github.io'
 const contentDir = resolve(process.cwd(), 'content')
 
 type PublishedPost = {
@@ -111,7 +111,7 @@ test('sitemap 包含全部公开路由与 lastmod，排除草稿和 404', async 
 
   for (const entry of entries) {
     expect(entry.loc, '每个 url 必须有绝对 loc').toMatch(
-      /^https:\/\/yuanhaisu\.com\//,
+      /^https:\/\/yuanhaisu\.github\.io\//,
     )
     expect(entry.lastmod, `${entry.loc} 应有 lastmod`).toMatch(
       /^\d{4}-\d{2}-\d{2}/,
@@ -163,7 +163,7 @@ test('feed.xml 是合法 RSS，包含标题、链接、日期、作者与摘要'
   for (const item of feed.items) {
     expect(item.title.length, '每条 feed 应有标题').toBeGreaterThan(0)
     expect(item.link, '每条 feed 应有绝对链接').toMatch(
-      /^https:\/\/yuanhaisu\.com\/posts\//,
+      /^https:\/\/yuanhaisu\.github\.io\/posts\//,
     )
     expect(item.author, '每条 feed 应有作者').toContain('袁海粟')
     expect(item.description.length, '每条 feed 应有摘要').toBeGreaterThan(0)

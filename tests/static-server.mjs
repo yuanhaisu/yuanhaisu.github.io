@@ -3,11 +3,6 @@ import { readFile, stat } from 'node:fs/promises'
 import { extname, join, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const defaultRedirectConfigPath = new URL(
-  '../cloudflare/www-redirect.json',
-  import.meta.url,
-)
-
 const contentTypes = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -33,26 +28,11 @@ async function fileStats(path) {
   }
 }
 
-async function readOptional(path) {
-  try {
-    return await readFile(path, 'utf8')
-  } catch {
-    return ''
-  }
-}
-
-async function loadRedirectConfig(path) {
-  try {
-    return JSON.parse(await readFile(path, 'utf8'))
-  } catch {
-    return null
-  }
-}
-
 /**
- * Emulate a Cloudflare Bulk Redirects entry locally. Cloudflare Pages
- * `_redirects` cannot match by host, so the www-to-apex rule lives in the
- * account-side config and this function mirrors its documented behavior.
+ * Emulate a future Cloudflare Bulk Redirects entry locally. This is archived
+ * configuration, not part of the GitHub Pages v1 deployment. The function is
+ * kept so the archived `cloudflare/www-redirect.json` stays executable and
+ * testable when the custom domain is reconnected.
  */
 export function hostRedirect(config, hostHeader, requestUrl) {
   const rule = config?.www_redirect
@@ -112,9 +92,12 @@ export function hostRedirect(config, hostHeader, requestUrl) {
  * Parse a Cloudflare Pages `_headers` file into rules.
  * A rule is a non-indented path pattern followed by indented `Name: value`
  * lines. Lines starting with `#` are comments.
+ *
+ * GitHub Pages ignores `_headers`; this parser exists only so the archived
+ * Cloudflare configuration can be checked before a future migration.
  */
-export async function loadHeaderRules(root) {
-  const source = await readOptional(join(root, '_headers'))
+export async function loadHeaderRules(filePath) {
+  const source = await readFile(filePath, 'utf8')
   const rules = []
   let current = null
 
@@ -152,47 +135,22 @@ function headerPatternToRegExp(pattern) {
   return new RegExp(`^${escaped.replace(/\*/g, '.*')}$`)
 }
 
-function headersForPath(rules, pathname) {
-  const headers = {}
-
-  for (const rule of rules) {
-    if (!rule.matcher.test(pathname)) continue
-    for (const [name, value] of rule.headers) {
-      headers[name] = headers[name] ? `${headers[name]}, ${value}` : value
-    }
-  }
-
-  return headers
-}
-
-export function createStaticServer(
-  root,
-  { redirectConfigPath = defaultRedirectConfigPath } = {},
-) {
+/**
+ * Serve the generated static site the way GitHub Pages does: files are served
+ * from the artifact root, directory routes use `index.html`, and unknown paths
+ * return the generated `404.html` with status 404.
+ *
+ * Response headers are intentionally not emulated: GitHub Pages does not
+ * support custom headers, so `cloudflare/_headers` is not applied here.
+ */
+export function createStaticServer(root) {
   const resolvedRoot = resolve(root)
-  const headerRulesPromise = loadHeaderRules(resolvedRoot)
-  const redirectConfigPromise = loadRedirectConfig(redirectConfigPath)
 
   return createServer(async (req, res) => {
     try {
-      const redirect = hostRedirect(
-        await redirectConfigPromise,
-        req.headers.host,
-        req.url ?? '/',
-      )
-      if (redirect) {
-        res.writeHead(redirect.status, {
-          location: redirect.location,
-          'content-length': 0,
-        })
-        res.end()
-        return
-      }
-
       const pathname = decodeURIComponent(
         new URL(req.url ?? '/', 'http://localhost').pathname,
       )
-      const headerRules = await headerRulesPromise
       let filePath = resolve(join(resolvedRoot, pathname))
 
       if (
@@ -209,14 +167,11 @@ export function createStaticServer(
         const indexPath = join(filePath, 'index.html')
         const indexInfo = await fileStats(indexPath)
         if (!indexInfo || indexInfo.isDirectory()) {
-          // Cloudflare Pages serves 404.html (generated from app/error.vue) for
-          // unknown paths; mirror that behavior locally.
           const notFoundPath = join(resolvedRoot, '404.html')
           const notFoundInfo = await fileStats(notFoundPath)
           if (notFoundInfo && !notFoundInfo.isDirectory()) {
             const notFoundBody = await readFile(notFoundPath)
             res.writeHead(404, {
-              ...headersForPath(headerRules, pathname),
               'content-type': contentTypes['.html'],
               'content-length': notFoundInfo.size,
             })
@@ -234,12 +189,11 @@ export function createStaticServer(
 
       const body = await readFile(filePath)
       res.writeHead(200, {
-        ...headersForPath(headerRules, pathname),
         'content-type': contentTypes[extname(filePath)] ?? 'application/octet-stream',
         'content-length': info.size,
       })
       res.end(body)
-    } catch (error) {
+    } catch {
       res.writeHead(500, { 'content-type': 'text/plain; charset=utf-8' })
       res.end('Internal server error')
     }

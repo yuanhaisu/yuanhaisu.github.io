@@ -5,6 +5,8 @@
 - 决策者：用户 + Claude
 - 取代：ADR-0002（v1 托管）、ADR-0004 的部署部分、ADR-0005 的服务与范围部分
 
+> 2026-11-12 更新：v1 先用 GitHub Pages 上线，规范 URL 为 `https://yuanhaisu.github.io`；`yuanhaisu.com` 保留为未来自定义域。托管与规范 URL 部分由 ADR-0008 取代，内容与分发策略不变。
+
 ## 背景
 
 2026-11-04，用户改变了此前「国内阿里云 + ICP 备案」的方案，转为：

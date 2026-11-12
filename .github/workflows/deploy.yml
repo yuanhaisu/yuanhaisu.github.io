@@ -1,0 +1,83 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build static site
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NUXT_TELEMETRY_DISABLED: '1'
+      CI: 'true'
+      # Public site config. Unset variables resolve to empty strings and the
+      # build falls back to the defaults in shared/site-config.mjs and
+      # app/utils/giscus.ts.
+      NUXT_PUBLIC_SITE_ORIGIN: ${{ vars.NUXT_PUBLIC_SITE_ORIGIN }}
+      NUXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN: ${{ vars.NUXT_PUBLIC_CLOUDFLARE_ANALYTICS_TOKEN }}
+      NUXT_PUBLIC_BAIDU_ANALYTICS_ID: ${{ vars.NUXT_PUBLIC_BAIDU_ANALYTICS_ID }}
+      NUXT_PUBLIC_GISCUS_REPO: ${{ vars.NUXT_PUBLIC_GISCUS_REPO }}
+      NUXT_PUBLIC_GISCUS_REPO_ID: ${{ vars.NUXT_PUBLIC_GISCUS_REPO_ID }}
+      NUXT_PUBLIC_GISCUS_CATEGORY: ${{ vars.NUXT_PUBLIC_GISCUS_CATEGORY }}
+      NUXT_PUBLIC_GISCUS_CATEGORY_ID: ${{ vars.NUXT_PUBLIC_GISCUS_CATEGORY_ID }}
+      NUXT_PUBLIC_ZHIHU_URL: ${{ vars.NUXT_PUBLIC_ZHIHU_URL }}
+      NUXT_PUBLIC_WECHAT_MP_URL: ${{ vars.NUXT_PUBLIC_WECHAT_MP_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate content guardrails
+        run: npm run validate:content
+
+      - name: Remove staged test fixtures
+        run: npm run clean:fixtures
+
+      - name: Scan tracked files for secrets
+        run: npm run check:secrets
+
+      - name: Build production site and Pagefind index
+        run: npm run build
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .output/public
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

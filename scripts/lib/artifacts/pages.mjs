@@ -293,7 +293,8 @@ export function validatePage(route, html) {
   const commentsTag = /<section\b[^>]*id="comments"[^>]*>/i.exec(html)?.[0] ?? ''
   assert(Boolean(commentsTag), `${label} 缺少评论容器`)
   assert(
-    getAttribute(commentsTag, 'data-giscus-repo') === 'yuanhaisu/blog',
+    getAttribute(commentsTag, 'data-giscus-repo') ===
+      'yuanhaisu/yuanhaisu.github.io',
     `${label} 的 Giscus repo 配置缺失`,
   )
   assert(

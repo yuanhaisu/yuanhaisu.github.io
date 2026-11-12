@@ -94,14 +94,13 @@ test('缺少 llms.txt 时上线验收失败并指出缺失文件', async () => {
   }
 })
 
-test('站内链接检查通过：全部公开路由 200、未知路由 404、www 301', async () => {
+test('站内链接检查通过：全部公开路由 200、未知路由 404', async () => {
   const { code, output } = await runScript('scripts/check-internal-links.mjs')
 
   expect(code, output).toBe(0)
   expect(output).toContain('PASS')
   expect(output).toContain('200')
   expect(output).toContain('404')
-  expect(output).toContain('www')
 })
 
 test('存在站内死链时链接检查失败并指出目标 URL', async () => {

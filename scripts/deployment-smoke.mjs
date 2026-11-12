@@ -1,34 +1,29 @@
 #!/usr/bin/env node
 /**
- * Deployment smoke test for the static blog.
+ * Deployment smoke test for the static blog on GitHub Pages.
  *
  * Local mode (default):
  *   - verifies the generated deployment artifacts in .output/public
- *   - serves them through the Cloudflare Pages emulator in tests/static-server.mjs
- *   - checks GET / for 200 + HSTS + CSP
- *   - checks the www Host redirect for 301 + preserved path/query
+ *   - serves them through the GitHub Pages emulator in tests/static-server.mjs
+ *   - checks GET / and a public route for 200, and an unknown path for 404
+ *   - confirms Cloudflare-only `_headers` is not shipped
  *
- * Live mode (SMOKE_BASE_URL=https://<preview>.pages.dev or https://yuanhaisu.com):
+ * Live mode (SMOKE_BASE_URL=https://yuanhaisu.github.io):
  *   - requires HTTPS
- *   - checks 200 + HSTS + CSP on the live origin
- *   - for SMOKE_BASE_URL=https://yuanhaisu.com (or SMOKE_CHECK_WWW=1), checks
- *     https://www.yuanhaisu.com/ -> 301 https://yuanhaisu.com/ and
- *     http://yuanhaisu.com/ -> 301/308 https://yuanhaisu.com/
+ *   - checks 200 and the canonical origin in the served HTML
+ *   - checks http:// -> https:// redirect
  *
- * The Cloudflare account-side configuration (DNS, Bulk Redirects, Always Use
- * HTTPS, Pages project) cannot be created from this repository. See
- * docs/deployment.md. This script never reads or prints credentials.
+ * GitHub Pages response headers are controlled by GitHub, not this repository:
+ * there is no custom CSP/HSTS seam here. See docs/deployment.md. This script
+ * never reads or prints credentials.
  */
-import { access, readFile } from 'node:fs/promises'
+import { access } from 'node:fs/promises'
 import { request as httpRequest } from 'node:http'
 import { resolve } from 'node:path'
-import {
-  createStaticServer,
-  hostRedirect,
-} from '../tests/static-server.mjs'
+import { SITE_ORIGIN } from '../shared/site-config.mjs'
+import { createStaticServer } from '../tests/static-server.mjs'
 
 const root = resolve('.output/public')
-const redirectConfigPath = resolve('cloudflare/www-redirect.json')
 const failures = []
 
 function check(condition, message, detail = '') {
@@ -41,16 +36,16 @@ function check(condition, message, detail = '') {
   failures.push(message)
 }
 
-function parseCsp(header) {
-  const directives = new Map()
-  for (const part of (header ?? '').split(';')) {
-    const [name, ...values] = part.trim().split(/\s+/)
-    if (name) directives.set(name, values)
+async function exists(path) {
+  try {
+    await access(path)
+    return true
+  } catch {
+    return false
   }
-  return directives
 }
 
-function request(baseURL, path, headers = {}) {
+function request(baseURL, path) {
   const url = new URL(baseURL)
   return new Promise((resolvePromise, reject) => {
     const req = httpRequest(
@@ -58,15 +53,19 @@ function request(baseURL, path, headers = {}) {
         hostname: url.hostname,
         port: url.port,
         path,
-        headers,
         timeout: 10_000,
       },
       (response) => {
-        response.resume()
+        let body = ''
+        response.setEncoding('utf8')
+        response.on('data', (chunk) => {
+          body += chunk
+        })
         response.on('end', () =>
           resolvePromise({
             status: response.statusCode ?? 0,
             headers: response.headers,
+            body,
           }),
         )
       },
@@ -77,110 +76,24 @@ function request(baseURL, path, headers = {}) {
   })
 }
 
-function checkHeaders(headers, label) {
-  const hsts = headers['strict-transport-security']
-  const cspHeader = headers['content-security-policy']
-  const csp = parseCsp(cspHeader)
-
-  check(
-    typeof hsts === 'string' &&
-      /max-age=(?:31536000|63072000)(?:;|\s|$)/.test(hsts) &&
-      hsts.includes('includeSubDomains'),
-    `${label}: HSTS present with long max-age and includeSubDomains`,
-  )
-  check(Boolean(cspHeader), `${label}: CSP present`)
-  check(
-    (csp.get('script-src') ?? []).includes("'unsafe-inline'") &&
-      (csp.get('script-src') ?? []).includes("'wasm-unsafe-eval'"),
-    `${label}: CSP allows Nuxt inline bootstrap and Pagefind WASM`,
-  )
-  check(
-    (csp.get('script-src') ?? []).includes('https://giscus.app') &&
-      (csp.get('frame-src') ?? []).includes('https://giscus.app'),
-    `${label}: CSP allows Giscus script and iframe`,
-  )
-  check(
-    (csp.get('script-src') ?? []).includes(
-      'https://static.cloudflareinsights.com',
-    ) &&
-      (csp.get('connect-src') ?? []).includes(
-        'https://cloudflareinsights.com',
-      ) &&
-      (csp.get('script-src') ?? []).includes('https://hm.baidu.com'),
-    `${label}: CSP allows Cloudflare Web Analytics and Baidu Analytics`,
-  )
-  check(
-    (csp.get('font-src') ?? []).includes("'self'") &&
-      !(csp.get('font-src') ?? []).some((source) =>
-        /fonts\.(?:googleapis|gstatic)\.com/.test(source),
-      ) &&
-      !(csp.get('style-src') ?? []).some((source) =>
-        /fonts\.googleapis\.com/.test(source),
-      ),
-    `${label}: CSP keeps fonts self-hosted`,
-  )
-  check(
-    (csp.get('worker-src') ?? []).includes("'self'") &&
-      (csp.get('worker-src') ?? []).includes('blob:'),
-    `${label}: CSP allows Pagefind workers`,
-  )
-}
-
 async function checkLocalArtifacts() {
   console.log('Local build artifacts')
 
-  try {
-    await access(resolve(root, 'index.html'))
-    await access(resolve(root, '_headers'))
-  } catch {
-    check(false, '.output/public exists with _headers (run npm run build)')
-    return
+  const required = [
+    'index.html',
+    '404.html',
+    'sitemap.xml',
+    'feed.xml',
+    'robots.txt',
+    'llms.txt',
+    'pagefind/pagefind.js',
+  ]
+  for (const file of required) {
+    check(await exists(resolve(root, file)), `.output/public/${file} exists`)
   }
-  check(true, '.output/public exists with _headers')
-
-  let config
-  try {
-    config = JSON.parse(await readFile(redirectConfigPath, 'utf8'))
-  } catch {
-    check(false, 'cloudflare/www-redirect.json is readable JSON')
-    return
-  }
-
-  const rule = config.www_redirect ?? {}
   check(
-    config.canonical_origin === 'https://yuanhaisu.com' &&
-      config.always_use_https === true,
-    'config declares apex canonical origin and Always Use HTTPS',
-  )
-  check(
-    rule.source_url === 'www.yuanhaisu.com' &&
-      rule.target_url === 'https://yuanhaisu.com' &&
-      Number(rule.status_code) === 301,
-    'config declares www -> https://yuanhaisu.com with 301',
-  )
-  check(
-    rule.preserve_query_string === true &&
-      rule.subpath_matching === true &&
-      rule.preserve_path_suffix === true,
-    'config preserves www path and query string',
-  )
-  check(
-    config.dns?.name === 'www' &&
-      config.dns?.proxied === true &&
-      typeof config.dns?.content === 'string',
-    'config documents a proxied www DNS record',
-  )
-
-  const expectedRedirect = hostRedirect(
-    config,
-    'www.yuanhaisu.com',
-    '/posts/example?from=smoke',
-  )
-  check(
-    expectedRedirect?.status === 301 &&
-      expectedRedirect.location ===
-        'https://yuanhaisu.com/posts/example?from=smoke',
-    'redirect config produces the expected 301 location',
+    !(await exists(resolve(root, '_headers'))),
+    'Cloudflare-only _headers is not shipped to GitHub Pages',
   )
 
   const server = createStaticServer(root)
@@ -192,19 +105,18 @@ async function checkLocalArtifacts() {
   const baseURL = `http://127.0.0.1:${port}`
 
   try {
-    const response = await request(baseURL, '/')
-    check(response.status === 200, 'GET / -> 200')
-    checkHeaders(response.headers, 'GET /')
-
-    const www = await request(baseURL, '/posts/example?from=smoke', {
-      host: 'www.yuanhaisu.com',
-    })
+    const home = await request(baseURL, '/')
+    check(home.status === 200, 'GET / -> 200')
     check(
-      www.status === 301 &&
-        www.headers.location ===
-          'https://yuanhaisu.com/posts/example?from=smoke',
-      'Host www.yuanhaisu.com -> 301 apex with path and query preserved',
+      home.body.includes(`rel="canonical" href="${SITE_ORIGIN}/"`),
+      'GET / carries the GitHub Pages canonical',
     )
+
+    const about = await request(baseURL, '/about')
+    check(about.status === 200, 'GET /about -> 200')
+
+    const missing = await request(baseURL, '/__smoke-missing-page')
+    check(missing.status === 404, 'unknown path -> 404')
   } finally {
     await new Promise((resolvePromise) => server.close(resolvePromise))
   }
@@ -230,58 +142,38 @@ async function checkLive(baseURL) {
   }
 
   check(response.status === 200, `GET ${baseURL}/ -> 200`, `got ${response.status}`)
-  checkHeaders(
-    {
-      'strict-transport-security': response.headers.get(
-        'strict-transport-security',
-      ),
-      'content-security-policy': response.headers.get(
-        'content-security-policy',
-      ),
-    },
-    `GET ${baseURL}/`,
+
+  const html = await response.text()
+  check(
+    html.includes(`rel="canonical" href="${SITE_ORIGIN}/"`),
+    `canonical points at ${SITE_ORIGIN}/`,
   )
 
-  if (
-    baseURL === 'https://yuanhaisu.com' ||
-    process.env.SMOKE_CHECK_WWW === '1'
-  ) {
-    try {
-      const httpResponse = await fetch('http://yuanhaisu.com/', {
-        redirect: 'manual',
-        signal: AbortSignal.timeout(15_000),
-      })
-      const httpLocation = httpResponse.headers.get('location') ?? ''
-      check(
-        [301, 308].includes(httpResponse.status) &&
-          httpLocation.startsWith('https://yuanhaisu.com/'),
-        'http://yuanhaisu.com/ forces HTTPS',
-        `got ${httpResponse.status} ${httpLocation}`,
-      )
-    } catch (error) {
-      check(false, 'http://yuanhaisu.com/ forces HTTPS', error.message)
-    }
-
-    try {
-      const wwwResponse = await fetch('https://www.yuanhaisu.com/', {
-        redirect: 'manual',
-        signal: AbortSignal.timeout(15_000),
-      })
-      const wwwLocation = wwwResponse.headers.get('location') ?? ''
-      check(
-        wwwResponse.status === 301 &&
-          wwwLocation.startsWith('https://yuanhaisu.com/'),
-        'https://www.yuanhaisu.com/ -> 301 https://yuanhaisu.com/',
-        `got ${wwwResponse.status} ${wwwLocation}`,
-      )
-    } catch (error) {
-      check(
-        false,
-        'https://www.yuanhaisu.com/ -> 301 https://yuanhaisu.com/',
-        error.message,
-      )
-    }
+  try {
+    const httpResponse = await fetch(`http://${new URL(baseURL).host}/`, {
+      redirect: 'manual',
+      signal: AbortSignal.timeout(15_000),
+    })
+    const location = httpResponse.headers.get('location') ?? ''
+    check(
+      [301, 302, 307, 308].includes(httpResponse.status) &&
+        location.startsWith(`https://${new URL(baseURL).host}/`),
+      'http:// requests redirect to https://',
+      `got ${httpResponse.status} ${location}`,
+    )
+  } catch (error) {
+    check(false, 'http:// requests redirect to https://', error.message)
   }
+
+  const missing = await fetch(`${baseURL}/__smoke-missing-page`, {
+    redirect: 'manual',
+    signal: AbortSignal.timeout(15_000),
+  })
+  check(
+    missing.status === 404,
+    'unknown path -> 404',
+    `got ${missing.status}`,
+  )
 }
 
 await checkLocalArtifacts()
@@ -300,8 +192,7 @@ if (failures.length) {
       (liveBaseURL ? ' Live deployment checks passed.' : ''),
   )
   console.log(
-    'Account-side checks still require the Cloudflare account: Pages project, ' +
-      'custom domains, Always Use HTTPS, and the www Bulk Redirect. ' +
-      'See docs/deployment.md.',
+    'GitHub Pages handles HTTPS and custom-domain settings in repository ' +
+      'settings; response headers are GitHub-managed. See docs/deployment.md.',
   )
 }
