@@ -70,3 +70,33 @@ export const seriesFrontmatterSchema = z
     description: z.string().min(1).optional(),
   })
   .strict()
+
+/**
+ * Project archive entries are evergreen pages, not dated posts. `order`
+ * controls display order; `updated` feeds sitemap lastmod.
+ */
+export const PROJECT_STATUSES = ['active', 'completed', 'archived']
+export const PROJECT_TYPES = ['开源', '客户交付', '个人产品', '实验']
+
+export const projectFrontmatterSchema = z
+  .object({
+    title: z.string().min(1),
+    description: z.string().min(1),
+    status: z.enum(PROJECT_STATUSES),
+    type: z.enum(PROJECT_TYPES),
+    period: z.string().min(1).optional(),
+    role: z.string().min(1).optional(),
+    stack: z.array(z.string().min(1)).default([]),
+    links: z
+      .object({
+        github: z.string().url().optional(),
+        demo: z.string().url().optional(),
+      })
+      .strict()
+      .optional(),
+    featured: z.boolean().default(false),
+    order: z.number().finite().optional(),
+    updated: isoDate.optional(),
+    relatedPosts: z.array(z.string().min(1)).default([]),
+  })
+  .strict()

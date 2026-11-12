@@ -5,7 +5,11 @@ const route = useRoute()
 const year = new Date().getFullYear()
 
 function isCurrent(path: string) {
-  return route.path === path
+  if (path === '/') {
+    return route.path === '/'
+  }
+
+  return route.path === path || route.path.startsWith(`${path}/`)
 }
 </script>
 
@@ -22,6 +26,12 @@ function isCurrent(path: string) {
             :aria-current="isCurrent('/') ? 'page' : undefined"
           >
             首页
+          </NuxtLink>
+          <NuxtLink
+            to="/projects"
+            :aria-current="isCurrent('/projects') ? 'page' : undefined"
+          >
+            项目
           </NuxtLink>
           <NuxtLink
             to="/search"

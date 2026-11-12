@@ -18,6 +18,7 @@ import {
   REQUIRED_FILES,
   collectHtmlRoutes,
   collectPublishedPosts,
+  collectPublishedProjects,
   expectedRoutes,
   pathExists,
 } from './source.mjs'
@@ -29,6 +30,7 @@ export async function validateArtifacts({
   resetValidationState()
 
   const posts = await collectPublishedPosts(contentDir)
+  const projects = await collectPublishedProjects(contentDir)
   const draftRoutes = await collectDraftRoutes({ contentDir })
   let htmlRoutes = new Map()
 
@@ -44,7 +46,7 @@ export async function validateArtifacts({
 
   await group('路由清单', async () => {
     htmlRoutes = await collectHtmlRoutes(rootDir)
-    const expected = expectedRoutes(posts)
+    const expected = expectedRoutes(posts, projects)
 
     for (const route of expected) {
       assert(htmlRoutes.has(route), `缺少公开路由产物：${route}`)
@@ -67,11 +69,11 @@ export async function validateArtifacts({
   })
 
   await group('sitemap.xml', () =>
-    validateSitemap(rootDir, posts, new Set(htmlRoutes.keys())),
+    validateSitemap(rootDir, posts, new Set(htmlRoutes.keys()), projects),
   )
   await group('feed.xml', () => validateFeed(rootDir, posts))
   await group('robots.txt', () => validateRobots(rootDir))
-  await group('llms.txt', () => validateLlms(rootDir, posts))
+  await group('llms.txt', () => validateLlms(rootDir, posts, projects))
   await group('Pagefind 中文索引', () => validatePagefind(rootDir, posts))
   await group('草稿隔离', () => validateContentDump(rootDir))
 
@@ -84,6 +86,7 @@ export async function validateArtifacts({
     counts: {
       routes: htmlRoutes.size,
       posts: posts.length,
+      projects: projects.length,
       drafts: draftRoutes.length,
     },
   }
@@ -105,7 +108,7 @@ export function formatReport(result, rootDir) {
     lines.push(`\nFAIL: ${result.failures.length} 项产物校验失败。`)
   } else {
     lines.push(
-      `\nPASS: ${result.checks.length} 组产物校验通过（${result.counts.routes} 条路由，${result.counts.posts} 篇文章）。`,
+      `\nPASS: ${result.checks.length} 组产物校验通过（${result.counts.routes} 条路由，${result.counts.posts} 篇文章，${result.counts.projects} 个项目）。`,
     )
   }
 

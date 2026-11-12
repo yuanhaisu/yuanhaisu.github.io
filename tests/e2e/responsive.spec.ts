@@ -9,6 +9,8 @@ const viewports = [
 const routes = [
   { path: '/', heading: /一人交付笔记/ },
   { path: '/archive', heading: '归档' },
+  { path: '/projects', heading: '项目' },
+  { path: '/projects/nurture-planet', heading: '养成星球' },
   { path: '/about', heading: /袁海粟/ },
   {
     path: '/posts/fixture-manifesto',

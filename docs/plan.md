@@ -88,6 +88,8 @@
 ```text
 /                          首页
 /posts/[slug]              文章详情（中文 canonical）
+/projects                  项目档案索引
+/projects/[slug]           项目详情（长期作品档案）
 /tags/[tag]                标签页
 /series/[series]           专题 / 连载页
 /about                     About（身份锚点核心页）

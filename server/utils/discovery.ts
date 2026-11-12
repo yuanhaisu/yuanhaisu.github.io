@@ -32,6 +32,38 @@ export function postLastmod(post: DiscoveryPost): string {
   return post.updated ?? post.date
 }
 
+export type DiscoveryProject = {
+  path: string
+  title: string
+  description: string
+  type: string
+  status: string
+  order?: number
+  updated?: string
+}
+
+/**
+ * Published project archive entries, ordered for the project index.
+ */
+export async function fetchDiscoveryProjects(
+  event: H3Event,
+): Promise<DiscoveryProject[]> {
+  const projects = (await queryCollection(event, 'projects').all()) as DiscoveryProject[]
+
+  return [...projects].sort((left, right) => {
+    const leftOrder =
+      typeof left.order === 'number' ? left.order : Number.POSITIVE_INFINITY
+    const rightOrder =
+      typeof right.order === 'number' ? right.order : Number.POSITIVE_INFINITY
+
+    if (leftOrder !== rightOrder) {
+      return leftOrder - rightOrder
+    }
+
+    return left.title.localeCompare(right.title, 'zh-Hans-CN')
+  })
+}
+
 /**
  * Newest content date across published posts, used as `lastmod` for
  * non-article pages. Falls back to the build date when there are no posts.

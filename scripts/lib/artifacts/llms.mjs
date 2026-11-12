@@ -4,7 +4,7 @@ import { LICENSE_URL, SITE_ORIGIN } from '../../../shared/site-config.mjs'
 import { assert } from './context.mjs'
 import { pathExists } from './source.mjs'
 
-export async function validateLlms(rootDir, posts) {
+export async function validateLlms(rootDir, posts, projects = []) {
   const path = join(rootDir, 'llms.txt')
   if (!(await pathExists(path))) {
     assert(false, 'llms.txt 缺失')
@@ -37,6 +37,21 @@ export async function validateLlms(rootDir, posts) {
       `llms.txt 缺少文章索引：${post.slug}`,
     )
     assert(text.includes(post.title), `llms.txt 缺少文章标题：${post.title}`)
+  }
+
+  assert(
+    text.includes(`${SITE_ORIGIN}/projects`),
+    'llms.txt 缺少项目索引页：/projects',
+  )
+  for (const project of projects) {
+    assert(
+      text.includes(`${SITE_ORIGIN}${project.path}`),
+      `llms.txt 缺少项目索引：${project.slug}`,
+    )
+    assert(
+      text.includes(project.title),
+      `llms.txt 缺少项目标题：${project.title}`,
+    )
   }
 
   const postUrlPattern = new RegExp(

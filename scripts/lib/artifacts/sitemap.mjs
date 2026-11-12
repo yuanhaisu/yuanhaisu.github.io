@@ -9,7 +9,7 @@ import {
   pathExists,
 } from './source.mjs'
 
-export async function validateSitemap(rootDir, posts, builtRoutes) {
+export async function validateSitemap(rootDir, posts, builtRoutes, projects = []) {
   const path = join(rootDir, 'sitemap.xml')
   if (!(await pathExists(path))) {
     assert(false, 'sitemap.xml 缺失')
@@ -59,8 +59,8 @@ export async function validateSitemap(rootDir, posts, builtRoutes) {
     }
   }
 
-  const expected = expectedRoutes(posts)
-  const expectedUrls = expectedSitemapUrls(posts)
+  const expected = expectedRoutes(posts, projects)
+  const expectedUrls = expectedSitemapUrls(posts, projects)
   for (const url of expectedUrls) {
     assert(locs.includes(url), `sitemap.xml 缺少公开路由：${url}`)
   }

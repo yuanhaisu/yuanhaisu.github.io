@@ -5,6 +5,7 @@
 | 术语 | 英文 / 缩写 | 定义 | 在本项目中的含义 |
 | --- | --- | --- | --- |
 | 博客 | Blog | 由作者持续发布文章的独立网站 | 指 `https://yuanhaisu.github.io` 主站，不含知乎/公众号等外部平台；`yuanhaisu.com` 保留为未来自定义域 |
+| 项目档案 | Project Archive | 长期维护的作品页，记录问题、约束、架构、结果与可复核证据 | 渲染为 `/projects` 与 `/projects/<slug>`；不进入 RSS 与 Pagefind，进入 sitemap 与 llms.txt |
 | 个人品牌 | Personal Brand | 他人在提及你时形成的稳定认知 | 以「人」为核心，跨技术/产品/职业思考 |
 | 生成式引擎优化 | GEO (Generative Engine Optimization) | 让生成式 AI 在回答中准确识别、引用、推荐某实体或内容的优化实践 | 本项目的首要成功标准 |
 | AI Agent | AI Agent / LLM Agent | 能自主搜索、抓取、整合信息并生成回答的智能体 | 包括国内外 AI 搜索与助手产品 |

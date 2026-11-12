@@ -6,8 +6,8 @@ import { addFailure } from './context.mjs'
 
 export { SITE_ORIGIN }
 
-export const STATIC_ROUTES = ['/', '/about', '/archive', '/privacy', '/search']
-export const SITEMAP_STATIC_ROUTES = ['/', '/about', '/archive', '/privacy']
+export const STATIC_ROUTES = ['/', '/projects', '/about', '/archive', '/privacy', '/search']
+export const SITEMAP_STATIC_ROUTES = ['/', '/projects', '/about', '/archive', '/privacy']
 
 export const REQUIRED_FILES = [
   'index.html',
@@ -82,13 +82,49 @@ export async function collectPublishedPosts(contentDir) {
   return posts.sort((left, right) => left.slug.localeCompare(right.slug))
 }
 
-export function expectedRoutes(posts) {
+export async function collectPublishedProjects(contentDir) {
+  const projectsDir = join(contentDir, 'projects')
+  if (!(await pathExists(projectsDir))) return []
+
+  const projects = []
+  for (const file of await walk(projectsDir)) {
+    if (!file.toLowerCase().endsWith('.md')) continue
+    const parsed = parseFrontmatter(await readFile(file, 'utf8'))
+    if (parsed.error) {
+      addFailure(
+        '内容源',
+        `${relative(contentDir, file)} frontmatter 解析失败：${parsed.error}`,
+      )
+      continue
+    }
+
+    const slug = relative(projectsDir, file)
+      .replace(/\.md$/i, '')
+      .split(sep)
+      .join('/')
+
+    projects.push({
+      slug,
+      path: `/projects/${slug}`,
+      title: String(parsed.data?.title ?? ''),
+      description: String(parsed.data?.description ?? ''),
+      type: String(parsed.data?.type ?? ''),
+      status: String(parsed.data?.status ?? ''),
+      updated: parsed.data?.updated ? String(parsed.data.updated) : undefined,
+    })
+  }
+
+  return projects.sort((left, right) => left.slug.localeCompare(right.slug))
+}
+
+export function expectedRoutes(posts, projects = []) {
   const tags = [...new Set(posts.flatMap((post) => post.tags))]
   const series = [...new Set(posts.flatMap((post) => post.series ?? []))]
 
   return new Set([
     ...STATIC_ROUTES,
     ...posts.map((post) => `/posts/${post.slug}`),
+    ...projects.map((project) => project.path),
     ...tags.map((tag) => `/tags/${tag}`),
     ...series.map((item) => `/series/${item}`),
   ])
@@ -105,7 +141,7 @@ export function encodeRoute(route) {
     .join('/')
 }
 
-export function expectedSitemapUrls(posts) {
+export function expectedSitemapUrls(posts, projects = []) {
   const tags = [...new Set(posts.flatMap((post) => post.tags))]
   const series = [...new Set(posts.flatMap((post) => post.series ?? []))]
 
@@ -113,6 +149,7 @@ export function expectedSitemapUrls(posts) {
     [
       ...SITEMAP_STATIC_ROUTES,
       ...posts.map((post) => `/posts/${post.slug}`),
+      ...projects.map((project) => project.path),
       ...tags.map((tag) => `/tags/${tag}`),
       ...series.map((item) => `/series/${item}`),
     ].map((route) => `${SITE_ORIGIN}${encodeRoute(route)}`),

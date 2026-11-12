@@ -196,10 +196,22 @@ export function validatePage(route, html) {
       nodesOfType(nodes, 'BlogPosting').length === 0,
       `${label} 非文章页不应输出 BlogPosting`,
     )
-    assert(
-      nodesOfType(nodes, 'BreadcrumbList').length === 0,
-      `${label} 非文章页不应输出 BreadcrumbList`,
-    )
+
+    if (route.startsWith('/projects/')) {
+      assert(
+        nodesOfType(nodes, 'CreativeWork').length === 1,
+        `${label} 应只有一个 CreativeWork`,
+      )
+      assert(
+        nodesOfType(nodes, 'BreadcrumbList').length === 1,
+        `${label} 应只有一个 BreadcrumbList`,
+      )
+    } else {
+      assert(
+        nodesOfType(nodes, 'BreadcrumbList').length === 0,
+        `${label} 非文章页不应输出 BreadcrumbList`,
+      )
+    }
     return
   }
 

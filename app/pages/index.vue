@@ -1,12 +1,14 @@
 <script setup lang="ts">
 const route = useRoute()
 
-const [{ data: posts }, { data: featuredPosts }] = await Promise.all([
-  useAsyncData('home-posts', () =>
-    queryPublishedPosts().order('date', 'DESC').all(),
-  ),
-  useAsyncData('home-featured-posts', () => fetchFeaturedPosts()),
-])
+const [{ data: posts }, { data: featuredPosts }, { data: featuredProjects }] =
+  await Promise.all([
+    useAsyncData('home-posts', () =>
+      queryPublishedPosts().order('date', 'DESC').all(),
+    ),
+    useAsyncData('home-featured-posts', () => fetchFeaturedPosts()),
+    useAsyncData('home-featured-projects', () => fetchFeaturedProjects()),
+  ])
 
 const profiles = useProfiles()
 const wechatProfile = computed(() =>
@@ -34,6 +36,21 @@ usePageSeo({
         模型服务、LLM 工具编排和一人 + 多 agent 流水线真正落到项目里的过程。
         这里写下方法、取舍、失败与可复核的证据。
       </p>
+    </section>
+
+    <section
+      v-if="featuredProjects?.length"
+      class="featured"
+      aria-labelledby="projects-heading"
+    >
+      <h2 id="projects-heading">项目</h2>
+      <ul class="post-list">
+        <ProjectCard
+          v-for="project in featuredProjects"
+          :key="project.path"
+          :project="project"
+        />
+      </ul>
     </section>
 
     <section

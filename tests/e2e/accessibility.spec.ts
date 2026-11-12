@@ -54,6 +54,8 @@ function expectNoViolations(violations: Violation[], label: string) {
 const lightPages = [
   { path: '/', label: '首页（浅色）' },
   { path: '/archive', label: '归档（浅色）' },
+  { path: '/projects', label: '项目（浅色）' },
+  { path: '/projects/nurture-planet', label: '项目详情（浅色）' },
   { path: '/about', label: '关于（浅色）' },
   { path: articlePath, label: '文章（浅色）' },
   { path: missingPath, label: '404（浅色）' },
@@ -70,6 +72,7 @@ for (const entry of lightPages) {
 
 const darkPages = [
   { path: '/', label: '首页（深色）' },
+  { path: '/projects/nurture-planet', label: '项目详情（深色）' },
   { path: articlePath, label: '文章（深色）' },
   { path: missingPath, label: '404（深色）' },
 ]
@@ -86,8 +89,8 @@ for (const entry of darkPages) {
 test.describe('360px 手机视口', () => {
   test.use({ viewport: { width: 360, height: 800 } })
 
-  test('首页与文章页达到 WCAG AA', async ({ page }) => {
-    for (const path of ['/', articlePath]) {
+  test('首页、项目页与文章页达到 WCAG AA', async ({ page }) => {
+    for (const path of ['/', '/projects', articlePath]) {
       await page.goto(path)
       expectNoViolations(await scan(page), `${path}（360px）`)
     }
@@ -95,7 +98,7 @@ test.describe('360px 手机视口', () => {
 })
 
 test('所有页面图片都有 alt 文本', async ({ page }) => {
-  for (const path of ['/', '/archive', '/about', articlePath, missingPath]) {
+  for (const path of ['/', '/archive', '/projects', '/projects/nurture-planet', '/about', articlePath, missingPath]) {
     await page.goto(path)
 
     const images = await page.locator('img').evaluateAll((elements) =>

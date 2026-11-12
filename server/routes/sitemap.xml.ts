@@ -6,6 +6,7 @@ import {
   encodeSegment,
   escapeXml,
   fetchDiscoveryPosts,
+  fetchDiscoveryProjects,
   postLastmod,
   siteLastmod,
 } from '../utils/discovery'
@@ -21,9 +22,15 @@ type SitemapEntry = {
  */
 export default defineEventHandler(async (event) => {
   const posts = await fetchDiscoveryPosts(event)
+  const projects = await fetchDiscoveryProjects(event)
   const pageLastmod = siteLastmod(posts)
   const entries: SitemapEntry[] = [
     { loc: absoluteUrl('/'), lastmod: pageLastmod },
+    { loc: absoluteUrl('/projects'), lastmod: pageLastmod },
+    ...projects.map((project) => ({
+      loc: absoluteUrl(project.path),
+      lastmod: project.updated ?? pageLastmod,
+    })),
     ...posts.map((post) => ({
       loc: absoluteUrl(post.path),
       lastmod: postLastmod(post),

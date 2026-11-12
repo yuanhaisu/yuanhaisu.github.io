@@ -125,3 +125,43 @@ export function buildBreadcrumbListJsonLd(entries: BreadcrumbEntry[]) {
     })),
   }
 }
+
+export interface ProjectSchemaInput {
+  title: string
+  description: string
+  type: string
+  status: string
+  stack?: string[]
+  links?: {
+    github?: string
+    demo?: string
+  }
+}
+
+/**
+ * CreativeWork node for an evergreen project page. The project is part of the
+ * site's WebSite entity and authored by the same Person `@id` as articles.
+ */
+export function buildProjectJsonLd(
+  project: ProjectSchemaInput,
+  canonicalUrl: string,
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    '@id': `${canonicalUrl}#project`,
+    name: project.title,
+    description: project.description,
+    url: canonicalUrl,
+    creator: { '@type': 'Person', '@id': PERSON_ID },
+    author: { '@type': 'Person', '@id': PERSON_ID },
+    genre: project.type,
+    creativeWorkStatus: project.status,
+    ...(project.stack?.length ? { keywords: project.stack.join(', ') } : {}),
+    ...(project.links?.github
+      ? { codeRepository: project.links.github }
+      : {}),
+    ...(project.links?.demo ? { sameAs: [project.links.demo] } : {}),
+    isPartOf: { '@type': 'WebSite', '@id': WEBSITE_ID },
+  }
+}

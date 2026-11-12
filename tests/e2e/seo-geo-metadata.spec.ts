@@ -55,6 +55,8 @@ const publicPages = [
   { path: '/archive', type: 'website' },
   { path: '/privacy', type: 'website' },
   { path: '/search', type: 'website' },
+  { path: '/projects', type: 'website' },
+  { path: '/projects/nurture-planet', type: 'website' },
   ...postPaths.map((path) => ({ path, type: 'article' as const })),
   { path: '/series/test-series', type: 'website' },
   { path: '/series/fixture-series', type: 'website' },

@@ -925,3 +925,111 @@ button:focus-visible {
   color: var(--muted);
   font-size: 0.9rem;
 }
+
+.project-group {
+  margin-top: 2.5rem;
+}
+
+.project-group h2 {
+  margin: 0 0 1rem;
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+}
+
+.project-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+}
+
+.project-card-link {
+  display: block;
+  padding: 1.25rem 1.4rem;
+  text-decoration: none;
+}
+
+.project-card-head,
+.project-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.project-card-head {
+  margin-bottom: 0.6rem;
+}
+
+.project-badges {
+  margin-bottom: 1rem;
+}
+
+.project-badge {
+  display: inline-block;
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 0.78rem;
+}
+
+.project-badge-muted {
+  border-color: var(--rule);
+  color: var(--muted);
+}
+
+.project-card-period,
+.project-period {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.project-card-title {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.project-card-description {
+  display: block;
+  margin-top: 0.4rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.project-card-stack {
+  display: block;
+  margin-top: 0.6rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.project-meta {
+  margin: 0.75rem 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.project-stack {
+  margin-top: 1rem;
+}
+
+.project-stack li span {
+  display: inline-block;
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 0.85rem;
+}
+
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.project-links a {
+  font-size: 0.9rem;
+}

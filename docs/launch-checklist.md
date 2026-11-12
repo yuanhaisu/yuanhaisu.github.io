@@ -34,14 +34,14 @@ CI 工作流 `.github/workflows/ci.yml` 在 Pull Request、推送到 `main` / `f
 | 内容护栏 | `npm run validate:content` | 通过：3 篇正式 + 7 篇测试夹具，1 篇草稿 | frontmatter schema、草稿隔离、正文内链目标、敏感字符串 |
 | 密钥扫描 | `npm run check:secrets` | 通过 | 只扫描 Git 跟踪文件；只输出路径与模式名，不输出匹配值 |
 | 静态构建（测试夹具） | `npm run build:test` | 通过：10 篇（3 正式 + 7 夹具），35 条路由 | 先 stage 测试夹具，再 `nuxt generate` + Pagefind 中文索引 |
-| 产物验收 | `npm run validate:artifacts` | 通过：9 组检查；35 条路由、10 篇文章 | 必需文件、路由清单、JSON-LD、canonical/OG/Twitter、无 JS 正文、sitemap、RSS、robots、llms.txt、Pagefind、草稿隔离 |
+| 产物验收 | `npm run validate:artifacts` | 通过：9 组检查；37 条路由、10 篇文章、1 个项目 | 必需文件、路由清单、JSON-LD、canonical/OG/Twitter、无 JS 正文、sitemap、RSS、robots、llms.txt、Pagefind、草稿隔离 |
 | 站内链接 | `npm run check:links` | 通过：4 组检查；35 个 HTML 页面、1052 个站内链接 | 所有公开路由 200、站内 href/src 200、未知路由 404、草稿路由 404 |
-| Playwright 全套 | `npm run test:e2e` | 通过（119 个测试） | 路由、404、无 JS、JSON-LD、SEO/GEO、RSS/sitemap/robots/llms、Pagefind 中文搜索、Giscus、统计同意门控、图片懒加载、GitHub Pages 产物、无障碍与响应式 |
+| Playwright 全套 | `npm run test:e2e` | 通过（126 个测试） | 路由、404、无 JS、JSON-LD、SEO/GEO、RSS/sitemap/robots/llms、Pagefind 中文搜索、项目档案、Giscus、统计同意门控、图片懒加载、GitHub Pages 产物、无障碍与响应式 |
 | 部署冒烟 | `npm run smoke:deployment` | 通过（本地构建产物） | 必需产物、200、404、canonical、无 Cloudflare `_headers` |
 
 ### 1.3 已确认的上线不变量
 
-- 每个公开路由（`/`、文章、标签、专题、`/about`、`/archive`、`/privacy`、`/search`）返回 200；未知路径返回 `404.html` 与 404 状态。
+- 每个公开路由（`/`、文章、`/projects`、项目详情、标签、专题、`/about`、`/archive`、`/privacy`、`/search`）返回 200；未知路径返回 `404.html` 与 404 状态。
 - 禁用 JavaScript 时，文章标题、日期、作者、正文仍在服务端 HTML 中；正文容器带 `data-pagefind-body`。
 - 每页只有一个 canonical、一个 Person、一个 WebSite；文章额外有 BlogPosting 与 BreadcrumbList；JSON-LD 可解析且 `@id` 唯一。
 - canonical、JSON-LD `@id`、OG/Twitter、sitemap、RSS、robots、llms.txt 全部指向 `https://yuanhaisu.github.io`。
@@ -52,6 +52,7 @@ CI 工作流 `.github/workflows/ci.yml` 在 Pull Request、推送到 `main` / `f
 - 草稿不出现在路由、sitemap、RSS、llms.txt、Pagefind 索引或内容数据库转储中；测试夹具由 `scripts/stage-content-fixtures.mjs` 在测试构建前复制。
 - 页脚与 404 页均展示 CC BY 4.0 授权链接；文章页脚同样展示。
 - 所有 Markdown 文章图片带 `loading="lazy"` 与 `decoding="async"`；首发文章通过 `launch: true` 接受至少 3 个站内链接与 1 张站内原创配图检查。
+- 项目页输出 `CreativeWork` 与 `BreadcrumbList` JSON-LD，进入 sitemap 与 llms.txt；不进入 RSS 与 Pagefind（站内搜索仍只搜文章）。
 - Cloudflare Web Analytics 无 Cookie、立即加载；百度统计默认不加载，仅在读者明确同意后插入脚本。
 - GitHub Pages 不支持自定义响应头，因此 v1 不承诺 CSP/HSTS；`cloudflare/_headers` 与 `cloudflare/www-redirect.json` 是归档配置，不进入构建产物。
 - `SITE_ORIGIN` 默认 `https://yuanhaisu.github.io`，可用 `NUXT_PUBLIC_SITE_ORIGIN` 覆盖；未来接回 `yuanhaisu.com` 时无需改代码。
@@ -62,9 +63,9 @@ CI 工作流 `.github/workflows/ci.yml` 在 Pull Request、推送到 `main` / `f
 
 | # | 工作标题 | 状态 |
 | --- | --- | --- |
-| 1 | 《我为什么开始「一人交付笔记」》 | 已写并扩写，待审阅/发布 |
-| 2 | 《一人交付实验 #1：一个人 + 多 agent，2.5 个月交付 14 万行 SaaS》 | 已写并扩写，待审阅/发布 |
-| 3 | 《一人交付实验 #2：AI 工程落地的三层栈》 | 已写并扩写，接近目标长度，待审阅/发布 |
+| 1 | 《我为什么开始「一人交付笔记」》 | 已写并扩写，已部署到站点 |
+| 2 | 《一人交付实验 #1：一个人 + 多 agent，2.5 个月交付 14 万行 SaaS》 | 已写并扩写，已部署到站点 |
+| 3 | 《一人交付实验 #2：AI 工程落地的三层栈》 | 已写并扩写，接近目标长度，已部署到站点 |
 
 第 2、3 篇的 frontmatter 日期分别是 2026-11-17 与 2026-11-24；如果希望上线当天三篇都算已发布，需要把日期调到今天或更早；如果按周连载，保持现状。
 
@@ -76,6 +77,10 @@ CI 工作流 `.github/workflows/ci.yml` 在 Pull Request、推送到 `main` / `f
 | 5 | 微信公众号 | 《一人公司的 AI 交付实验：第一期复盘》 | 已写草稿，canonical 已改为 github.io，待发布 |
 
 平台稿发布后，把真实 URL 写入 `NUXT_PUBLIC_ZHIHU_URL` / `NUXT_PUBLIC_WECHAT_MP_URL`，重新构建并确认 About 与 JSON-LD `sameAs` 同步。
+
+### 2.3 项目档案
+
+`/projects` 与 `/projects/<slug>` 已实现；当前有 1 个项目档案（养成星球）。其他项目按 `content/projects/<slug>.md` 的 frontmatter（`status`、`type`、`stack`、`links`、`relatedPosts`）补充即可，不需要新建页面代码。项目页不进入 RSS 与 Pagefind，但会进入 sitemap、llms.txt，并输出 `CreativeWork` JSON-LD。
 
 ## 3. 外部账号步骤
 

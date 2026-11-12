@@ -4,7 +4,14 @@ import { PERSON, SITE } from '../../app/utils/site'
 import {
   absoluteUrl,
   fetchDiscoveryPosts,
+  fetchDiscoveryProjects,
 } from '../utils/discovery'
+
+const projectStatusLabels: Record<string, string> = {
+  active: '进行中',
+  completed: '已完成',
+  archived: '归档',
+}
 
 function inlineText(value: string): string {
   return value.replace(/([\\[\]()])/g, '\\$1').replace(/\s*\r?\n\s*/g, ' ')
@@ -17,6 +24,7 @@ function inlineText(value: string): string {
  */
 export default defineEventHandler(async (event) => {
   const posts = await fetchDiscoveryPosts(event)
+  const projects = await fetchDiscoveryProjects(event)
 
   const articleLines = posts
     .map(
@@ -24,6 +32,21 @@ export default defineEventHandler(async (event) => {
         `- [${inlineText(post.title)}](${absoluteUrl(post.path)}) — ${inlineText(post.description)}（${post.date}）`,
     )
     .join('\n')
+
+  const projectLines = projects
+    .map(
+      (project) =>
+        `- [${inlineText(project.title)}](${absoluteUrl(project.path)}) — ${inlineText(project.description)}（${project.type} / ${projectStatusLabels[project.status] ?? project.status}）`,
+    )
+    .join('\n')
+
+  const projectSection = projects.length
+    ? `## 项目档案
+
+${projectLines}
+
+`
+    : ''
 
   setHeader(event, 'content-type', 'text/plain; charset=utf-8')
 
@@ -46,13 +69,14 @@ ${SITE.name}是袁海粟（Yuan Haisu）的个人博客，中文 canonical，记
 ## 核心页面
 
 - [首页](${SITE_ORIGIN}/)
+- [项目](${SITE_ORIGIN}/projects)
 - [关于（身份锚点）](${SITE_ORIGIN}/about)
 - [归档](${SITE_ORIGIN}/archive)
 - [隐私说明](${SITE_ORIGIN}/privacy)
 - [RSS 订阅](${SITE_ORIGIN}/feed.xml)
 - [Sitemap](${SITE_ORIGIN}/sitemap.xml)
 
-## 文章索引
+${projectSection}## 文章索引
 
 ${articleLines}
 

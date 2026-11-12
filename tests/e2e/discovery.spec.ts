@@ -16,6 +16,12 @@ type PublishedPost = {
   series?: string
 }
 
+type PublishedProject = {
+  slug: string
+  title: string
+  description: string
+}
+
 async function collectPublishedPosts(): Promise<PublishedPost[]> {
   const postsDir = join(contentDir, 'posts')
   const files: string[] = []
@@ -57,6 +63,51 @@ async function collectPublishedPosts(): Promise<PublishedPost[]> {
   return posts
 }
 
+async function collectPublishedProjects(): Promise<PublishedProject[]> {
+  const projectsDir = join(contentDir, 'projects')
+  const files: string[] = []
+
+  async function visit(directory: string) {
+    let entries
+    try {
+      entries = await readdir(directory, { withFileTypes: true })
+    } catch {
+      return
+    }
+
+    for (const entry of entries) {
+      const path = join(directory, entry.name)
+      if (entry.isDirectory()) {
+        await visit(path)
+      } else if (entry.isFile() && entry.name.endsWith('.md')) {
+        files.push(path)
+      }
+    }
+  }
+
+  await visit(projectsDir)
+
+  const projects: PublishedProject[] = []
+
+  for (const file of files) {
+    const { data } = parseFrontmatter(await readFile(file, 'utf8'))
+    if (!data) {
+      continue
+    }
+
+    projects.push({
+      slug: relative(projectsDir, file)
+        .replace(/\.md$/, '')
+        .split(sep)
+        .join('/'),
+      title: String(data.title ?? ''),
+      description: String(data.description ?? ''),
+    })
+  }
+
+  return projects
+}
+
 async function parseXml(page: Page, body: string) {
   const result = await page.evaluate((xml) => {
     const document = new DOMParser().parseFromString(xml, 'application/xml')
@@ -89,11 +140,14 @@ async function sitemapEntries(page: Page) {
 
 test('sitemap 包含全部公开路由与 lastmod，排除草稿和 404', async ({ page }) => {
   const posts = await collectPublishedPosts()
+  const projects = await collectPublishedProjects()
   const entries = await sitemapEntries(page)
   const locs = entries.map((entry) => entry.loc)
 
   const expected = [
     `${siteUrl}/`,
+    `${siteUrl}/projects`,
+    ...projects.map((project) => `${siteUrl}/projects/${project.slug}`),
     `${siteUrl}/about`,
     `${siteUrl}/archive`,
     ...posts.map((post) => `${siteUrl}/posts/${post.slug}`),
@@ -270,6 +324,7 @@ test('llms.txt 包含站点简介、作者、核心页面、文章索引、授�
   page,
 }) => {
   const posts = await collectPublishedPosts()
+  const projects = await collectPublishedProjects()
   const response = await page.request.get('/llms.txt')
   expect(response.status(), '/llms.txt 应可访问').toBe(200)
 
@@ -282,6 +337,7 @@ test('llms.txt 包含站点简介、作者、核心页面、文章索引、授�
 
   for (const link of [
     `${siteUrl}/`,
+    `${siteUrl}/projects`,
     `${siteUrl}/about`,
     `${siteUrl}/archive`,
     `${siteUrl}/privacy`,
@@ -289,6 +345,13 @@ test('llms.txt 包含站点简介、作者、核心页面、文章索引、授�
     `${siteUrl}/sitemap.xml`,
   ]) {
     expect(text, `llms.txt 应链接核心页面 ${link}`).toContain(link)
+  }
+
+  for (const project of projects) {
+    expect(text, `llms.txt 应索引项目 ${project.slug}`).toContain(
+      `${siteUrl}/projects/${project.slug}`,
+    )
+    expect(text).toContain(project.title)
   }
 
   for (const post of posts) {
