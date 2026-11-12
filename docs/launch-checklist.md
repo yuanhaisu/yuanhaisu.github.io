@@ -131,10 +131,9 @@ SMOKE_BASE_URL=https://yuanhaisu.github.io npm run smoke:deployment
 
 ### 3.5 域名邮箱
 
-`hi@yuanhaisu.com` 当前没有 MX 记录，邮件会退信。上线前二选一：
+`hi@yuanhaisu.com` 当前没有 MX 记录，已从 About、隐私页、`llms.txt`、Person JSON-LD 与 RSS 中移除；公开联系改为 <https://github.com/yuanhaisu>。
 
-- 开通阿里云企业邮箱免费版，在域名 DNS 添加 MX/SPF/DKIM；或
-- 在 About、`llms.txt`、JSON-LD 中暂时改用 GitHub 作为公开联系方式。
+未来开通阿里云企业邮箱并配置 MX/SPF/DKIM 后，可以再把邮箱加回 About 与 JSON-LD；在邮箱可用之前不要发布 `mailto:` 链接。
 
 `yuanhaisu.com` 本身保留，不影响 GitHub Pages 站点。
 
@@ -151,6 +150,6 @@ SMOKE_BASE_URL=https://yuanhaisu.github.io npm run smoke:deployment
 
 - [x] 仓库侧 `npm run ci` 通过。
 - [ ] 3 篇中文博客 + 2 篇平台文章完成并发布（3 篇博客已发布到站点，平台稿 0/2 发布）。
-- [ ] 统计 ID、平台 URL 与域名邮箱完成并复验（GitHub Pages 与 Giscus 已完成）。
+- [ ] 统计 ID 与平台 URL 完成并复验（GitHub Pages、Giscus 与 GitHub 公开联系已完成）。
 
 GitHub Pages 站点已经可访问，但 v1 的「上线」仍以平台稿发布与统计/联系方式完成为准；在此之前不要对外宣布全部完成。

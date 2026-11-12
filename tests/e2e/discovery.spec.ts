@@ -148,7 +148,7 @@ test('feed.xml 是合法 RSS，包含标题、链接、日期、作者与摘要'
         title: text(item, 'title'),
         link: text(item, 'link'),
         pubDate: text(item, 'pubDate'),
-        author: text(item, 'author'),
+        creator: text(item, 'dc:creator'),
         description: text(item, 'description'),
       })),
     }
@@ -165,7 +165,7 @@ test('feed.xml 是合法 RSS，包含标题、链接、日期、作者与摘要'
     expect(item.link, '每条 feed 应有绝对链接').toMatch(
       /^https:\/\/yuanhaisu\.github\.io\/posts\//,
     )
-    expect(item.author, '每条 feed 应有作者').toContain('袁海粟')
+    expect(item.creator, '每条 feed 应有作者').toContain('袁海粟')
     expect(item.description.length, '每条 feed 应有摘要').toBeGreaterThan(0)
     expect(
       Number.isNaN(Date.parse(item.pubDate)),
@@ -301,5 +301,5 @@ test('llms.txt 包含站点简介、作者、核心页面、文章索引、授�
 
   expect(text).toContain('CC BY 4.0')
   expect(text).toContain('https://creativecommons.org/licenses/by/4.0/')
-  expect(text).toContain('hi@yuanhaisu.com')
+  expect(text).toContain('https://github.com/yuanhaisu')
 })

@@ -79,7 +79,7 @@
 | 统计 | Cloudflare Web Analytics + 百度统计 | 全球基线 + 国内细节 |
 | 搜索 | Pagefind 1.6+ | 支持中文查询分词 |
 | Newsletter | 微信公众号 | 中文；英文 Buttondown 放 v1.1 |
-| 域名邮箱 | 阿里云企业邮箱免费版 | `hi@yuanhaisu.com`，**待开通**；当前无 MX，公开联系优先 GitHub |
+| 域名邮箱 | 阿里云企业邮箱免费版 | `hi@yuanhaisu.com`，**待开通**；当前无 MX，公开联系已改为 GitHub |
 | 分发 | 知乎 + 微信公众号 | 每月 1 篇旗舰；小红书/抖音 v2 |
 | 未来托管 | `yuanhaisu.com` + Cloudflare Pages（归档） | 需要时切回，canonical 由 `NUXT_PUBLIC_SITE_ORIGIN` 统一切换 |
 
@@ -392,7 +392,7 @@ export default defineContentConfig({
 1. **GitHub**：新建 `yuanhaisu/yuanhaisu` Profile README；归档旧 fork；把 `kindergarten` 设为私有。
 2. **案例仓库**：新建 `nurture-planet-case-study`，先放 README 与架构图。
 3. **GitHub Pages**：仓库 Settings → Pages → Source 设为 GitHub Actions；推送 `main` 触发 `.github/workflows/deploy.yml`。
-4. **邮箱**：申请阿里云企业邮箱免费版，配置 MX/SPF/DKIM，开通 `hi@yuanhaisu.com`；开通前公开联系优先 GitHub。
+4. **邮箱**：申请阿里云企业邮箱免费版，配置 MX/SPF/DKIM，开通 `hi@yuanhaisu.com`；开通前公开联系使用 GitHub。
 5. **站点**：v1 骨架、3 篇首发文章与 GitHub Pages 部署已完成，继续补充真实统计与平台 URL。
 6. **平台**：注册/完善知乎、微信公众号，统一头像与简介。
 7. **内容**：先写第 1 篇《我为什么开始「一人交付笔记」》的提纲。

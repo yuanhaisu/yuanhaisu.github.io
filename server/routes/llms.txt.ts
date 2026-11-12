@@ -40,8 +40,7 @@ ${SITE.name}是袁海粟（Yuan Haisu）的个人博客，中文 canonical，记
 - 姓名：袁海粟（Yuan Haisu / yuanhaisu）
 - 身份：${PERSON.jobTitle}
 - 简介：${PERSON.description}
-- GitHub：https://github.com/yuanhaisu
-- 邮箱：${PERSON.email}
+- GitHub：${PERSON.contactUrl}
 - RSS：${SITE_ORIGIN}/feed.xml
 
 ## 核心页面
@@ -63,7 +62,6 @@ ${articleLines}
 
 ## 联系方式
 
-- 邮箱：${PERSON.email}
-- GitHub：https://github.com/yuanhaisu
+- GitHub：${PERSON.contactUrl}
 `
 })

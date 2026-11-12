@@ -105,13 +105,10 @@ usePageSeo({
 
       <h2>公开联系方式</h2>
       <ul class="profile-list">
-        <li>
-          <a :href="`mailto:${PERSON.email}`">{{ PERSON.email }}</a>
-        </li>
         <SiteProfileLinks :profiles="profiles" show-detail />
       </ul>
       <p>
-        目前开放远程的后端 / 全栈 / AI 应用开发机会，也欢迎一人公司与独立开发者交流合作。邮件是最可靠的公开联系方式。
+        目前开放远程的后端 / 全栈 / AI 应用开发机会，也欢迎一人公司与独立开发者交流合作。GitHub 是最可靠的公开联系方式。
       </p>
     </div>
   </article>

@@ -28,4 +28,4 @@
 - GitHub Pages 不提供 CSP、HSTS 等自定义安全头；这是 v1 接受的取舍。未来若安全头成为硬要求，可切回 Cloudflare Pages 或在前方加一层代理。
 - `github.io` 在中国大陆的直连稳定性不如商业 CDN；国内触达继续依赖知乎与微信公众号，国内镜像仍在 v2 评估。
 - 未来接回自定义域时，需要处理 canonical 迁移、平台稿链接更新与旧地址 301；`SITE_ORIGIN` 的单点配置降低代码侧成本，但外部链接与搜索引擎收录仍需迁移计划。
-- `hi@yuanhaisu.com` 目前没有 MX 记录；域名邮箱开通前，公开联系方式应优先使用 GitHub。
+- `hi@yuanhaisu.com` 目前没有 MX 记录，公开联系方式已改为 GitHub；域名邮箱开通后可再加回。

@@ -10,8 +10,9 @@ import {
 
 /**
  * RSS 2.0 feed of published posts, regenerated from content on every build.
- * Each item includes title, canonical link, publication date, author, and
- * summary; drafts never enter the feed.
+ * Each item includes title, canonical link, publication date, Dublin Core
+ * creator, and summary; drafts never enter the feed. The public contact is
+ * GitHub, so the feed deliberately carries no email address.
  */
 export default defineEventHandler(async (event) => {
   const posts = await fetchDiscoveryPosts(event)
@@ -29,7 +30,7 @@ export default defineEventHandler(async (event) => {
         `      <link>${escapeXml(absoluteUrl(post.path))}</link>`,
         `      <guid isPermaLink="true">${escapeXml(absoluteUrl(post.path))}</guid>`,
         `      <pubDate>${escapeXml(rssDate(post.date))}</pubDate>`,
-        `      <author>${escapeXml(`${PERSON.email} (${PERSON.name})`)}</author>`,
+        `      <dc:creator>${escapeXml(PERSON.name)}</dc:creator>`,
         `      <description>${escapeXml(post.description)}</description>`,
         categories,
         '    </item>',
@@ -42,7 +43,7 @@ export default defineEventHandler(async (event) => {
   setHeader(event, 'content-type', 'application/rss+xml; charset=utf-8')
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
     <title>${escapeXml(SITE.name)}</title>
     <link>${escapeXml(`${SITE.url}/`)}</link>

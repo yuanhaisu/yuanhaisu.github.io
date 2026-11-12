@@ -23,7 +23,7 @@ export const PERSON = {
   alternateName: ['Yuan Haisu', 'yuanhaisu'],
   url: SITE_ORIGIN,
   avatar: `${SITE_ORIGIN}/avatar.png`,
-  email: 'hi@yuanhaisu.com',
+  contactUrl: 'https://github.com/yuanhaisu',
   jobTitle: '后端工程师，一人公司 AI 交付实践者',
   positioning: '一人公司的 AI 交付实验',
   description:

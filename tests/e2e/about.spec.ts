@@ -28,11 +28,9 @@ test('About 页展示身份主张、可验证经历、代表项目、技能与�
   await expect(article).toContainText('多 agent 流水线')
 
   await expect(
-    page.getByRole('link', { name: 'hi@yuanhaisu.com' }),
-  ).toHaveAttribute('href', 'mailto:hi@yuanhaisu.com')
-  await expect(
     page.getByRole('link', { name: /github\.com\/yuanhaisu/ }),
   ).toHaveAttribute('href', 'https://github.com/yuanhaisu')
+  await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0)
 
   // 知乎与公众号尚未确认真实主页 URL，页面只能展示明确的待补充占位，
   // 不得编造链接。

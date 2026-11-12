@@ -20,7 +20,6 @@ export function buildPersonJsonLd(profileSameAs: string[] = []) {
     alternateName: [...PERSON.alternateName],
     url: PERSON.url,
     image: PERSON.avatar,
-    email: `mailto:${PERSON.email}`,
     jobTitle: PERSON.jobTitle,
     description: PERSON.description,
     knowsAbout: [...PERSON.knowsAbout],

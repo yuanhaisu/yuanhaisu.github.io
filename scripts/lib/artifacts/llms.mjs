@@ -53,7 +53,7 @@ export async function validateLlms(rootDir, posts) {
 
   assert(text.includes('CC BY 4.0'), 'llms.txt 缺少授权声明')
   assert(text.includes(LICENSE_URL), 'llms.txt 缺少 CC BY 4.0 链接')
-  assert(text.includes('hi@yuanhaisu.com'), 'llms.txt 缺少联系方式')
+  assert(text.includes('https://github.com/yuanhaisu'), 'llms.txt 缺少 GitHub 联系方式')
   assert(!text.includes('draft-example-not-published'), 'llms.txt 泄露了草稿')
 
   return `${posts.length} 篇文章`

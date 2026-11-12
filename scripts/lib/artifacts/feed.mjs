@@ -45,7 +45,7 @@ export async function validateFeed(rootDir, posts) {
     const title = value('title')
     const link = value('link')
     const pubDate = value('pubDate')
-    const author = value('author')
+    const author = value('dc:creator')
     const description = value('description')
 
     assert(title.length > 0, 'feed.xml 条目缺少标题')
