@@ -3,6 +3,7 @@
 状态（2026-11-12）：
 
 - **当前托管**：GitHub Pages 用户站，地址 <https://yuanhaisu.github.io>；仓库 `yuanhaisu/yuanhaisu.github.io`，发布源为 **GitHub Actions**。
+- **首次部署**：2026-11-12 成功；首页、文章、sitemap、RSS、robots、llms.txt、Pagefind 均 200；`http://` 301 到 `https://`；未知路径返回 404。
 - **构建**：`.github/workflows/deploy.yml` 在推送 `main` 时运行 `npm run validate:content` → `npm run clean:fixtures` → `npm run check:secrets` → `npm run build`，只发布 `content/` 中的正式内容。
 - **规范 URL**：`https://yuanhaisu.github.io`；`yuanhaisu.com` 保留为未来自定义域。
 - **已归档**：Cloudflare Pages 项目 `yuanhaisu-blog`、`cloudflare/_headers`、`cloudflare/www-redirect.json` 不再参与上线，只保留为未来迁移参考。

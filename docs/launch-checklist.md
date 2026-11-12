@@ -8,7 +8,7 @@
 - **待完成（内容）**：需要写作或发布的内容工作。
 - **阻塞（账号侧）**：需要登录 GitHub、百度统计、知乎、公众号等外部账号，仓库与 CI 无法代做。
 
-> 当前结论：**代码/仓库侧门禁通过；3 篇博客与 2 篇平台稿初稿已写；GitHub Pages 发布工作流已配置，等待首次部署复验。** 统计 ID、平台 URL 与平台稿发布仍未完成，因此还不能对外宣布 v1 完成。
+> 当前结论：**代码/仓库侧门禁通过；GitHub Pages 已部署并复验；3 篇博客与 2 篇平台稿初稿已写。** 统计 ID、平台 URL 与平台稿发布仍未完成，因此还不能把 v1 标记为全部完成。
 
 ## 1. 代码 / 仓库侧：通过
 
@@ -85,9 +85,11 @@ CI 工作流 `.github/workflows/ci.yml` 在 Pull Request、推送到 `main` / `f
 | --- | --- | --- |
 | 仓库 | 已重命名为 `yuanhaisu/yuanhaisu.github.io`；旧链接自动跳转 | 无 |
 | Pages Source | 已设为 **GitHub Actions** | 无 |
-| 发布工作流 | `.github/workflows/deploy.yml` 已添加，推送 `main` 触发 | 首次部署后复验 |
-| 站点地址 | `https://yuanhaisu.github.io` | 等待首次部署完成 |
-| HTTPS | GitHub Pages 自动签发并强制 HTTPS | 部署后复验 |
+| 发布工作流 | `.github/workflows/deploy.yml` 已添加；推送 `main` 后 CI 与 Deploy 均为 success | 无 |
+| 站点地址 | `https://yuanhaisu.github.io` 已上线，首页/文章/sitemap/RSS/robots/llms.txt/Pagefind 均 200 | 无 |
+| HTTPS | 已强制；`http://` 301 到 `https://` | 无 |
+| 404 | 未知路径返回 404 与生成的 `404.html` | 无 |
+| 文章 URL | `/posts/slug` 301 到 `/posts/slug/` 后 200；canonical 不带尾斜杠 | v1 接受；后续可统一尾斜杠 |
 
 部署后运行：
 
@@ -148,7 +150,7 @@ SMOKE_BASE_URL=https://yuanhaisu.github.io npm run smoke:deployment
 只有以下三项同时满足，才能把 v1 标记为已上线：
 
 - [x] 仓库侧 `npm run ci` 通过。
-- [ ] 3 篇中文博客 + 2 篇平台文章完成并发布（3 篇博客已写，平台稿 0/2 发布）。
-- [ ] GitHub Pages 首次部署、统计 ID、Giscus 真机复验、平台 URL 与邮箱全部完成并复验。
+- [ ] 3 篇中文博客 + 2 篇平台文章完成并发布（3 篇博客已发布到站点，平台稿 0/2 发布）。
+- [ ] 统计 ID、平台 URL 与域名邮箱完成并复验（GitHub Pages 与 Giscus 已完成）。
 
-在此之前，可以使用 `https://yuanhaisu.github.io` 预览，但不应对外宣布 v1 完成。
+GitHub Pages 站点已经可访问，但 v1 的「上线」仍以平台稿发布与统计/联系方式完成为准；在此之前不要对外宣布全部完成。

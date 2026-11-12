@@ -133,7 +133,7 @@ GitHub Pages 不支持自定义响应头，因此 v1 不承诺 CSP/HSTS；`cloud
 
 ## 当前状态
 
-站点已从 Cloudflare Pages 预览迁移到 GitHub Pages：仓库重命名为 `yuanhaisu/yuanhaisu.github.io`，Pages 构建源切换为 GitHub Actions，canonical/JSON-LD/sitemap/RSS/llms.txt 全部指向 `https://yuanhaisu.github.io`。生产内容有 **3 篇正式文章初稿**，7 篇测试夹具只在测试/CI 时 staged；2 篇平台稿草稿已写。Giscus 已指向真实仓库与 Announcements 分类；统计 ID、平台 URL 与平台稿发布仍待账号侧完成。详见[上线验收清单](docs/launch-checklist.md)。
+站点已从 Cloudflare Pages 预览迁移到 GitHub Pages 并完成首次部署：**<https://yuanhaisu.github.io>**。仓库重命名为 `yuanhaisu/yuanhaisu.github.io`，Pages 构建源切换为 GitHub Actions，canonical/JSON-LD/sitemap/RSS/llms.txt 全部指向新地址。生产内容有 **3 篇正式文章初稿**，7 篇测试夹具只在测试/CI 时 staged；2 篇平台稿草稿已写。Giscus 已指向真实仓库与 Announcements 分类；统计 ID、平台 URL 与平台稿发布仍待账号侧完成。详见[上线验收清单](docs/launch-checklist.md)。
 
 ## 关键约束
 
