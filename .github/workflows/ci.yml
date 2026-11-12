@@ -52,13 +52,13 @@ jobs:
       - name: Validate JSON-LD, sitemap, RSS, robots, llms.txt, Pagefind
         run: npm run validate:artifacts
 
-      - name: Check internal links, 404, and www redirect
+      - name: Check internal links and 404
         run: npm run check:links
 
       - name: Run Playwright suite
         run: npm run test:e2e
 
-      - name: Deployment smoke (local Cloudflare Pages emulation)
+      - name: Deployment smoke (local GitHub Pages emulation)
         run: npm run smoke:deployment
 
       - name: Upload Playwright diagnostics on failure
