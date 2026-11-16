@@ -22,6 +22,10 @@ const channel =
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
+  // Local Windows runs drive Edge and can exhaust memory with the default
+  // worker count; cap local parallelism. CI uses Chromium and keeps its own
+  // default.
+  workers: process.env.CI ? undefined : 2,
   reporter: 'list',
   projects: [
     {
