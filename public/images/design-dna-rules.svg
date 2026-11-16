@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1010" role="img" aria-labelledby="title desc">
+  <title id="title">Design DNA 的三个关键决定</title>
+  <desc id="desc">一张说明设计 DNA 的信息图：色彩采用暖纸底、深松绿和单一强调色；字体采用衬线标题 400 加无衬线正文；形体采用 1px 发丝线、无阴影、行内高亮和一屏一焦点。底部展示工具分工：DNA 定义、OpenDesign 发散、Impeccable 收敛、人验收。</desc>
+
+  <defs>
+    <style>
+      .serif { font-family: 'Instrument Serif', 'Noto Serif SC', 'Songti SC', 'STSong', Georgia, serif; }
+      .sans { font-family: 'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', sans-serif; }
+    </style>
+  </defs>
+
+  <!-- canvas -->
+  <rect width="800" height="1010" rx="20" fill="#ECE6D7"/>
+
+  <!-- header -->
+  <text x="24" y="64" class="serif" font-size="38" fill="#173220">Design DNA 的三个关键决定</text>
+  <text x="24" y="96" class="sans" font-size="17" fill="#55616F">从一个现成设计里提取规则，而不是凭感觉描述。</text>
+
+  <!-- card 01 -->
+  <rect x="24" y="124" width="360" height="360" rx="18" fill="#FFFFFF" stroke="#D8D2C4" stroke-width="1"/>
+  <text x="48" y="166" class="sans" font-size="24" font-weight="600" fill="#173220">色彩</text>
+  <text x="360" y="166" class="sans" font-size="16" fill="#C36540" text-anchor="end">01</text>
+
+  <g class="sans">
+    <rect x="48" y="190" width="48" height="48" rx="12" fill="#ECE6D7" stroke="#D8D2C4" stroke-width="1"/>
+    <text x="72" y="252" font-size="11" fill="#55616F" text-anchor="middle">bone</text>
+
+    <rect x="104" y="190" width="48" height="48" rx="12" fill="#173220"/>
+    <text x="128" y="252" font-size="11" fill="#55616F" text-anchor="middle">pine</text>
+
+    <rect x="160" y="190" width="48" height="48" rx="12" fill="#CFD9C5"/>
+    <text x="184" y="252" font-size="11" fill="#55616F" text-anchor="middle">sage</text>
+
+    <rect x="216" y="190" width="48" height="48" rx="12" fill="#DDB14A"/>
+    <text x="240" y="252" font-size="11" fill="#55616F" text-anchor="middle">marigold</text>
+
+    <rect x="272" y="190" width="48" height="48" rx="12" fill="#C36540"/>
+    <text x="296" y="252" font-size="11" fill="#55616F" text-anchor="middle">terracotta</text>
+  </g>
+
+  <text x="48" y="294" class="sans" font-size="20" font-weight="600" fill="#173220">暖纸底 + 深松绿</text>
+  <text x="48" y="324" class="sans" font-size="17" fill="#55616F">画布 #ECE6D7，正文 #173220</text>
+  <text x="48" y="352" class="sans" font-size="17" fill="#55616F">橙色只做提示层，不做主按钮</text>
+  <text x="48" y="380" class="sans" font-size="17" fill="#55616F">语义色取自同一套土色</text>
+
+  <rect x="48" y="404" width="312" height="1" fill="#E4E2D6"/>
+  <text x="48" y="434" class="sans" font-size="13" fill="#8A6A4F">No pure black. No pure white text.</text>
+
+  <!-- card 02 -->
+  <rect x="416" y="124" width="360" height="360" rx="18" fill="#FFFFFF" stroke="#D8D2C4" stroke-width="1"/>
+  <text x="440" y="166" class="sans" font-size="24" font-weight="600" fill="#173220">字体</text>
+  <text x="752" y="166" class="sans" font-size="16" fill="#C36540" text-anchor="end">02</text>
+
+  <text x="440" y="248" class="serif" font-size="64" fill="#173220">Aa</text>
+  <text x="440" y="274" class="sans" font-size="12" fill="#55616F">Instrument Serif / Noto Serif SC</text>
+
+  <text x="440" y="318" class="sans" font-size="20" font-weight="600" fill="#173220">标题 400，不加粗</text>
+  <text x="440" y="346" class="sans" font-size="17" fill="#55616F">H1 30px / 行高 1.35</text>
+
+  <rect x="440" y="368" width="312" height="1" fill="#E4E2D6"/>
+
+  <text x="440" y="402" class="sans" font-size="20" font-weight="600" fill="#173220">正文：无衬线 400 / 600</text>
+  <text x="440" y="430" class="sans" font-size="17" fill="#55616F">衬线正文 17px / 行高 1.8</text>
+  <text x="440" y="456" class="sans" font-size="17" fill="#55616F">层级靠字号与留白，不靠 weight</text>
+
+  <!-- card 03 -->
+  <rect x="24" y="508" width="752" height="280" rx="18" fill="#FFFFFF" stroke="#D8D2C4" stroke-width="1"/>
+  <text x="48" y="550" class="sans" font-size="24" font-weight="600" fill="#173220">形体与层级</text>
+  <text x="752" y="550" class="sans" font-size="16" fill="#C36540" text-anchor="end">03</text>
+
+  <!-- mini card with inline highlight -->
+  <rect x="48" y="578" width="330" height="120" rx="16" fill="#FFFFFF" stroke="#D8D2C4" stroke-width="1"/>
+  <text x="68" y="616" class="sans" font-size="16" fill="#173220">今天</text>
+  <rect x="104" y="600" width="56" height="22" rx="2" fill="#CFD9C5"/>
+  <text x="110" y="616" class="sans" font-size="16" fill="#173220">已入园</text>
+  <text x="164" y="616" class="sans" font-size="16" fill="#173220">，07:52 到园</text>
+
+  <text x="68" y="656" class="sans" font-size="16" fill="#173220">情绪</text>
+  <rect x="104" y="640" width="40" height="22" rx="2" fill="#DDB14A"/>
+  <text x="110" y="656" class="sans" font-size="16" fill="#173220">很好</text>
+  <text x="148" y="656" class="sans" font-size="16" fill="#173220">，早餐吃了一碗粥</text>
+
+  <text x="410" y="600" class="sans" font-size="20" font-weight="600" fill="#173220">1px 发丝线 · 无阴影</text>
+  <text x="410" y="628" class="sans" font-size="16" fill="#55616F">靠明度差分层，不靠「浮起来」</text>
+
+  <rect x="410" y="650" width="330" height="1" fill="#E4E2D6"/>
+
+  <text x="410" y="684" class="sans" font-size="20" font-weight="600" fill="#173220">行内高亮 · 一屏一焦点</text>
+  <text x="410" y="712" class="sans" font-size="16" fill="#55616F">标签不做胶囊，内容集中在上 60%</text>
+  <text x="410" y="738" class="sans" font-size="16" fill="#55616F">分区 24–32px，下方敢留空</text>
+
+  <!-- tool division -->
+  <rect x="24" y="812" width="752" height="170" rx="18" fill="#FFFFFF" stroke="#D8D2C4" stroke-width="1"/>
+  <text x="48" y="850" class="sans" font-size="20" font-weight="600" fill="#173220">工具的正确分工</text>
+
+  <g class="sans" font-size="15" text-anchor="middle">
+    <rect x="48" y="868" width="150" height="48" rx="24" fill="#173220"/>
+    <text x="123" y="898" fill="#ECE6D7">DNA 定义</text>
+
+    <text x="213" y="898" font-size="20" fill="#55616F">→</text>
+
+    <rect x="228" y="868" width="160" height="48" rx="24" fill="#FFFFFF" stroke="#173220" stroke-width="1"/>
+    <text x="308" y="898" fill="#173220">OpenDesign 发散</text>
+
+    <text x="403" y="898" font-size="20" fill="#55616F">→</text>
+
+    <rect x="418" y="868" width="160" height="48" rx="24" fill="#FFFFFF" stroke="#173220" stroke-width="1"/>
+    <text x="498" y="898" fill="#173220">Impeccable 收敛</text>
+
+    <text x="593" y="898" font-size="20" fill="#55616F">→</text>
+
+    <rect x="608" y="868" width="144" height="48" rx="24" fill="#DDB14A"/>
+    <text x="680" y="898" fill="#173220">人验收</text>
+  </g>
+
+  <text x="48" y="948" class="sans" font-size="14" fill="#55616F">工具没有审美；审美由人提供，或由一份已经被验证过的 DNA 提供。</text>
+  <text x="752" y="948" class="sans" font-size="12" fill="#8A6A4F" text-anchor="end">规则可以迁移，身份必须重做。</text>
+</svg>

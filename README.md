@@ -35,7 +35,7 @@ GitHub 内容源 → GitHub Actions → GitHub Pages → `https://yuanhaisu.gith
 
 ```bash
 npm install            # 安装依赖
-npm run dev            # 生产内容（当前 3 篇正式文章）
+npm run dev            # 生产内容（当前 4 篇正式文章）
 npm run dev:fixtures   # 带测试夹具的本地开发
 npm run build          # 生产构建，不包含测试夹具
 npm run build:test     # 测试构建：先 stage tests/fixtures/content/，再构建
@@ -94,7 +94,7 @@ NUXT_PUBLIC_WECHAT_MP_URL=https://mp.weixin.qq.com/s/<article-or-profile>
 ## 内容、草稿与上线护栏
 
 - 真实草稿放在 `content/posts/drafts/`，该目录被 `.gitignore` 忽略，不会被提交。草稿仍会被内容护栏读取并验证 frontmatter，但不会进入路由、sitemap、RSS、llms.txt 或 Pagefind。
-- **所有测试夹具**（文章、专题、草稿）存放在 `tests/fixtures/content/`，由 `scripts/stage-content-fixtures.mjs` 在 `npm run build:test` / `npm run validate:content` / CI 前复制到被忽略的 `content/posts/`、`content/posts/drafts/`、`content/series/`；`npm run clean:fixtures` 会按 manifest 只删除 staged 文件，不会碰真实内容。生产构建 `npm run build` 不 stage 夹具；`content/` 里现在有 3 篇正式文章初稿。
+- **所有测试夹具**（文章、专题、草稿）存放在 `tests/fixtures/content/`，由 `scripts/stage-content-fixtures.mjs` 在 `npm run build:test` / `npm run validate:content` / CI 前复制到被忽略的 `content/posts/`、`content/posts/drafts/`、`content/series/`；`npm run clean:fixtures` 会按 manifest 只删除 staged 文件，不会碰真实内容。生产构建 `npm run build` 不 stage 夹具；`content/` 里现在有 4 篇正式文章初稿。
 - 首发文章在 frontmatter 写 `launch: true`。内容护栏会要求至少 3 个不同的站内链接和至少 1 张站内原创配图，并允许链接到由已发布文章生成动态 `/tags/...`、`/series/...` 路由。测试夹具与未到发布阶段的文章不写该字段，因此不受约束。
 
 ## 项目档案
@@ -157,7 +157,7 @@ GitHub Pages 不支持自定义响应头，因此 v1 不承诺 CSP/HSTS；`cloud
 
 ## 当前状态
 
-站点已从 Cloudflare Pages 预览迁移到 GitHub Pages 并完成首次部署：**<https://yuanhaisu.github.io>**。仓库重命名为 `yuanhaisu/yuanhaisu.github.io`，Pages 构建源切换为 GitHub Actions，canonical/JSON-LD/sitemap/RSS/llms.txt 全部指向新地址。生产内容有 **3 篇正式文章**、**1 个项目档案**（养成星球），7 篇测试夹具只在测试/CI 时 staged；2 篇平台稿草稿已写。Giscus 已指向真实仓库与 Announcements 分类；统计 ID、平台 URL 与平台稿发布仍待账号侧完成。详见[上线验收清单](docs/launch-checklist.md)。
+站点已从 Cloudflare Pages 预览迁移到 GitHub Pages 并完成首次部署：**<https://yuanhaisu.github.io>**。仓库重命名为 `yuanhaisu/yuanhaisu.github.io`，Pages 构建源切换为 GitHub Actions，canonical/JSON-LD/sitemap/RSS/llms.txt 全部指向新地址。生产内容有 **4 篇正式文章**、**1 个项目档案**（养成星球），7 篇测试夹具只在测试/CI 时 staged；2 篇平台稿草稿已写。Giscus 已指向真实仓库与 Announcements 分类；统计 ID、平台 URL 与平台稿发布仍待账号侧完成。详见[上线验收清单](docs/launch-checklist.md)。
 
 ## 关键约束
 
