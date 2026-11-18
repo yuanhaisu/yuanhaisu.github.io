@@ -33,6 +33,28 @@ private/images/
 
 这两篇文章最初以全文提交到公开仓库。2026-11-18 已用 `git filter-branch` 从 `main` 历史中移除全文，并强制推送；当前 `main` 只包含摘要版本。
 
+### 需要 GitHub Support 清除的旧提交
+
+以下提交仍可能通过 SHA 直接访问，包含私有的完整正文或架构图：
+
+```text
+777e913071af410bf3b0c1e720f43bc8cdba966e
+6a7faaf34efd0ec308b11d2ee67ef30c8cb1543e
+c89b2d923a32157a760920659ecc2a30160e8c0e
+bbd5f54f69d8a0cd20a809879cff9637eec30abb
+```
+
+涉及的路径：
+
+```text
+content/posts/dataprocess-plugin-architecture.md
+content/posts/plugin-service-internals.md
+public/images/dataprocess-plugin-host.svg
+public/images/plugin-service-internals.svg
+```
+
+GitHub 可能继续通过旧 commit SHA 提供孤立提交。仓库所有者应向 GitHub Support 提交“移除敏感数据”请求，附上上述 SHA 与路径。
+
 仍需要注意：
 
 - GitHub 可能继续通过旧 commit SHA 提供孤立提交。仓库所有者应向 GitHub Support 提交“移除敏感数据”请求，附上旧 commit SHA。
