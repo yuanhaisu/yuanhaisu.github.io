@@ -42,6 +42,9 @@ export const postFrontmatterSchema = z
     // must link to at least three internal routes and include an original
     // site-local diagram/image; test fixtures leave it false.
     launch: z.boolean().default(false),
+    // `teaser` keeps the public page intentionally short. The full text must
+    // stay outside this public repository (see .gitignore: private/).
+    visibility: z.enum(['public', 'teaser']).default('public'),
     lang: z.enum(['zh', 'en']),
     translationOf: z.string().min(1).optional(),
     license: z.string().min(1),

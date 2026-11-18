@@ -34,9 +34,9 @@ CI 工作流 `.github/workflows/ci.yml` 在 Pull Request、推送到 `main` / `f
 | 内容护栏 | `npm run validate:content` | 通过：3 篇正式 + 7 篇测试夹具，1 篇草稿 | frontmatter schema、草稿隔离、正文内链目标、敏感字符串 |
 | 密钥扫描 | `npm run check:secrets` | 通过 | 只扫描 Git 跟踪文件；只输出路径与模式名，不输出匹配值 |
 | 静态构建（测试夹具） | `npm run build:test` | 通过：10 篇（3 正式 + 7 夹具），35 条路由 | 先 stage 测试夹具，再 `nuxt generate` + Pagefind 中文索引 |
-| 产物验收 | `npm run validate:artifacts` | 通过：9 组检查；37 条路由、10 篇文章、1 个项目 | 必需文件、路由清单、JSON-LD、canonical/OG/Twitter、无 JS 正文、sitemap、RSS、robots、llms.txt、Pagefind、草稿隔离 |
+| 产物验收 | `npm run validate:artifacts` | 通过：9 组检查；50 条路由、13 篇文章、1 个项目 | 必需文件、路由清单、JSON-LD、canonical/OG/Twitter、无 JS 正文、sitemap、RSS、robots、llms.txt、Pagefind、草稿隔离 |
 | 站内链接 | `npm run check:links` | 通过：4 组检查；35 个 HTML 页面、1052 个站内链接 | 所有公开路由 200、站内 href/src 200、未知路由 404、草稿路由 404 |
-| Playwright 全套 | `npm run test:e2e` | 通过（126 个测试） | 路由、404、无 JS、JSON-LD、SEO/GEO、RSS/sitemap/robots/llms、Pagefind 中文搜索、项目档案、Giscus、统计同意门控、图片懒加载、GitHub Pages 产物、无障碍与响应式 |
+| Playwright 全套 | `npm run test:e2e` | 通过（129 个测试） | 路由、404、无 JS、JSON-LD、SEO/GEO、RSS/sitemap/robots/llms、Pagefind 中文搜索、项目档案、摘要文章、Giscus、统计同意门控、图片懒加载、GitHub Pages 产物、无障碍与响应式 |
 | 部署冒烟 | `npm run smoke:deployment` | 通过（本地构建产物） | 必需产物、200、404、canonical、无 Cloudflare `_headers` |
 
 ### 1.3 已确认的上线不变量
@@ -67,7 +67,7 @@ CI 工作流 `.github/workflows/ci.yml` 在 Pull Request、推送到 `main` / `f
 | 2 | 《一人交付实验 #1：一个人 + 多 agent，2.5 个月交付 14 万行 SaaS》 | 已写并扩写，已部署到站点 |
 | 3 | 《一人交付实验 #2：AI 工程落地的三层栈》 | 已写并扩写，接近目标长度，已部署到站点 |
 
-第 3 篇的 frontmatter 日期已从 2026-11-24 调整为 2026-11-18（今天），避免未来日期提前出现在首页与 sitemap。
+第 3 篇的 frontmatter 日期已从 2026-11-24 调整为 2026-11-17，避免未来日期提前出现在首页与 sitemap。
 
 ### 2.2 2 篇平台文章（草稿，待发布）
 
@@ -81,6 +81,10 @@ CI 工作流 `.github/workflows/ci.yml` 在 Pull Request、推送到 `main` / `f
 ### 2.3 项目档案
 
 `/projects` 与 `/projects/<slug>` 已实现；当前有 1 个项目档案（养成星球）。其他项目按 `content/projects/<slug>.md` 的 frontmatter（`status`、`type`、`stack`、`links`、`relatedPosts`）补充即可，不需要新建页面代码。项目页不进入 RSS 与 Pagefind，但会进入 sitemap、llms.txt，并输出 `CreativeWork` JSON-LD。
+
+### 2.4 摘要文章
+
+两篇 2026-11-13 的文章（`dataprocess-plugin-architecture`、`plugin-service-internals`）使用 `visibility: teaser`：公开页只保留问题背景、设计方向与「完整内容暂不公开」提示，列表和归档带「摘要」标记；完整正文存放在本地 `private/posts/`（被 `.gitignore` 忽略），不进入公开仓库或构建产物。公开页的摘要文本仍会进入 sitemap、llms.txt、RSS 摘要与 Pagefind。
 
 ## 3. 外部账号步骤
 

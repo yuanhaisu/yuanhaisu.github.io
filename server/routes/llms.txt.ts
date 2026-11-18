@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
   const articleLines = posts
     .map(
       (post) =>
-        `- [${inlineText(post.title)}](${absoluteUrl(post.path)}) — ${inlineText(post.description)}（${post.date}）`,
+        `- [${inlineText(post.title)}](${absoluteUrl(post.path)}) — ${inlineText(post.description)}（${post.date}${post.visibility === 'teaser' ? '，摘要' : ''}）`,
     )
     .join('\n')
 

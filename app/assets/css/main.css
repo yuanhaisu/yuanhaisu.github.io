@@ -1033,3 +1033,40 @@ button:focus-visible {
 .project-links a {
   font-size: 0.9rem;
 }
+
+.post-badge {
+  display: inline-block;
+  margin-left: 0.45rem;
+  padding: 0 0.45rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 400;
+  vertical-align: middle;
+}
+
+.post-teaser-label {
+  margin: 0 0 0.5rem;
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+
+.post-private-notice {
+  margin: 2rem 0;
+  padding: 1.25rem 1.4rem;
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.post-private-notice h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+}
+
+.post-private-notice p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}

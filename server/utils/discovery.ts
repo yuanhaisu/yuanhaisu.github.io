@@ -10,6 +10,7 @@ export type DiscoveryPost = {
   updated?: string
   tags?: string[]
   series?: string
+  visibility?: string
 }
 
 /**

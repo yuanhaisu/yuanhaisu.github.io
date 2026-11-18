@@ -17,6 +17,8 @@ const readingMinutes = computed(() =>
   estimateReadingMinutes(post.value?.body),
 )
 
+const isTeaser = computed(() => post.value?.visibility === 'teaser')
+
 interface TocLink {
   id?: string
   depth: number
@@ -121,9 +123,15 @@ useJsonLd([
 </script>
 
 <template>
-  <article v-if="post" class="post" data-pagefind-body>
+  <article
+    v-if="post"
+    class="post"
+    :data-visibility="post.visibility"
+    data-pagefind-body
+  >
     <header class="post-header">
       <p class="eyebrow">一人交付笔记</p>
+      <p v-if="isTeaser" class="post-teaser-label">摘要 · 完整内容不公开</p>
       <h1 data-pagefind-meta="title">{{ post.title }}</h1>
       <p class="post-meta">
         <span>作者：袁海粟</span>
@@ -175,6 +183,18 @@ useJsonLd([
 
     <CodeCopyEnhancer :content-key="post.path" />
 
+    <aside v-if="isTeaser" class="post-private-notice">
+      <h2>完整内容暂不公开</h2>
+      <p>
+        这篇文章的完整版本仅作者本人可见。公开页面只保留问题背景与设计方向。
+      </p>
+      <p>
+        想交流这个方向，可以通过
+        <a href="https://github.com/yuanhaisu">GitHub</a>
+        找到我。
+      </p>
+    </aside>
+
     <nav
       v-if="previousPost || nextPost"
       class="post-pagination"
@@ -221,6 +241,6 @@ useJsonLd([
       </nav>
     </footer>
 
-    <PostComments />
+    <PostComments v-if="!isTeaser" />
   </article>
 </template>
