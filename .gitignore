@@ -22,3 +22,5 @@ content/posts/fixture-*.md
 content/series/test-series.md
 content/series/fixture-*.md
 .fixtures-staged.json
+# Full text of teaser-only posts; never publish or commit.
+private/
