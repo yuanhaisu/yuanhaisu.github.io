@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nuxt dev",
     "dev:fixtures": "node scripts/stage-content-fixtures.mjs && nuxt dev",
-    "build": "nuxt generate && npm run search:index",
+    "build": "node scripts/clean-output.mjs && nuxt generate && npm run search:index",
     "build:test": "node scripts/stage-content-fixtures.mjs && npm run build",
     "generate": "npm run build",
     "search:index": "node scripts/build-search-index.mjs",
