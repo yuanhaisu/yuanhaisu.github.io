@@ -18,6 +18,9 @@
 private/posts/
 ├── dataprocess-plugin-architecture.full.md
 └── plugin-service-internals.full.md
+private/images/
+├── dataprocess-plugin-host.svg
+└── plugin-service-internals.svg
 ```
 
 注意：
