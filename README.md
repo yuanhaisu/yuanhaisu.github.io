@@ -15,6 +15,7 @@ GitHub 内容源 → GitHub Actions → GitHub Pages → `https://yuanhaisu.gith
 
 - [实施总案](docs/plan.md)
 - [上线验收清单](docs/launch-checklist.md)
+- [摘要文章与私有全文](docs/private-content.md)
 - [首发内容提纲](docs/content-outlines.md)
 - 平台稿：[知乎草稿](docs/platform-posts/zhihu.md) · [公众号草稿](docs/platform-posts/wechat.md)
 - [术语表](GLOSSARY.md)
@@ -96,7 +97,7 @@ NUXT_PUBLIC_WECHAT_MP_URL=https://mp.weixin.qq.com/s/<article-or-profile>
 - 真实草稿放在 `content/posts/drafts/`，该目录被 `.gitignore` 忽略，不会被提交。草稿仍会被内容护栏读取并验证 frontmatter，但不会进入路由、sitemap、RSS、llms.txt 或 Pagefind。
 - **所有测试夹具**（文章、专题、草稿）存放在 `tests/fixtures/content/`，由 `scripts/stage-content-fixtures.mjs` 在 `npm run build:test` / `npm run validate:content` / CI 前复制到被忽略的 `content/posts/`、`content/posts/drafts/`、`content/series/`；`npm run clean:fixtures` 会按 manifest 只删除 staged 文件，不会碰真实内容。生产构建 `npm run build` 不 stage 夹具；`content/` 里现在有 6 篇正式文章（其中 2 篇为摘要）。
 - 首发文章在 frontmatter 写 `launch: true`。内容护栏会要求至少 3 个不同的站内链接和至少 1 张站内原创配图，并允许链接到由已发布文章生成动态 `/tags/...`、`/series/...` 路由。测试夹具与未到发布阶段的文章不写该字段，因此不受约束。
-- `visibility: teaser` 的文章在公开站点只展示摘要与「完整内容暂不公开」提示，列表和归档会带「摘要」标记；完整正文放在被 `.gitignore` 忽略的 `private/`，不能进入公开仓库或构建产物。
+- `visibility: teaser` 的文章在公开站点只展示摘要与「完整内容暂不公开」提示，列表和归档会带「摘要」标记；完整正文放在被 `.gitignore` 忽略的 `private/`，不能进入公开仓库或构建产物。详见[摘要文章与私有全文](docs/private-content.md)。
 
 ## 项目档案
 

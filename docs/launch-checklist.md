@@ -84,7 +84,7 @@ CI 工作流 `.github/workflows/ci.yml` 在 Pull Request、推送到 `main` / `f
 
 ### 2.4 摘要文章
 
-两篇 2026-11-13 的文章（`dataprocess-plugin-architecture`、`plugin-service-internals`）使用 `visibility: teaser`：公开页只保留问题背景、设计方向与「完整内容暂不公开」提示，列表和归档带「摘要」标记；完整正文存放在本地 `private/posts/`（被 `.gitignore` 忽略），不进入公开仓库或构建产物。公开页的摘要文本仍会进入 sitemap、llms.txt、RSS 摘要与 Pagefind。
+两篇 2026-11-13 的文章（`dataprocess-plugin-architecture`、`plugin-service-internals`）使用 `visibility: teaser`：公开页只保留问题背景、设计方向与「完整内容暂不公开」提示，列表和归档带「摘要」标记；完整正文存放在本地 `private/posts/`（被 `.gitignore` 忽略），不进入公开仓库或构建产物。公开页的摘要文本仍会进入 sitemap、llms.txt、RSS 摘要与 Pagefind。完整流程与历史清理注意事项见[摘要文章与私有全文](private-content.md)。
 
 ## 3. 外部账号步骤
 
